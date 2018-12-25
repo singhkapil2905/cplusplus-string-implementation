@@ -119,8 +119,84 @@ namespace kapil {
 
       iterator begin();
       iterator end();
-      iterator cbegin();
-      iterator cend();
+
+      class const_iterator
+      {
+        private:
+          const string* str_;
+          size_t index_;
+        public:
+          const_iterator(const string* = nullptr, size_t = 0);
+          const_iterator(const const_iterator&);
+          const_iterator(const_iterator&&) noexcept;
+          ~const_iterator();
+
+          const_iterator& operator = (const const_iterator&);
+          const_iterator& operator = (const_iterator&&) noexcept;
+          bool operator != (const const_iterator&) const noexcept;
+          bool operator == (const const_iterator&) const noexcept;
+          const_iterator& operator ++ ();
+          const_iterator& operator ++ (int);
+          const_iterator& operator -- ();
+          const_iterator& operator -- (int);
+          const char& operator * () const;
+
+      };
+
+      const_iterator cbegin();
+      const_iterator cend();
+
+      class reverse_iterator
+      {
+        private:
+          string* str_;
+          size_t index_;
+        public:
+          reverse_iterator(string* = nullptr, size_t = 0);
+          reverse_iterator(const reverse_iterator&);
+          reverse_iterator(reverse_iterator&&) noexcept;
+          ~reverse_iterator();
+
+          reverse_iterator& operator = (const reverse_iterator&);
+          reverse_iterator& operator = (reverse_iterator&&) noexcept;
+          bool operator != (const reverse_iterator&) const noexcept;
+          bool operator == (const reverse_iterator&) const noexcept;
+          reverse_iterator& operator ++ ();
+          reverse_iterator& operator ++ (int);
+          reverse_iterator& operator -- ();
+          reverse_iterator& operator -- (int);
+          char& operator * () const;
+
+      };
+
+      reverse_iterator rbegin();
+      reverse_iterator rend();
+
+      class reverse_const_iterator
+      {
+        private:
+          const string* str_;
+          size_t index_;
+        public:
+          reverse_const_iterator(const string* = nullptr, size_t = 0);
+          reverse_const_iterator(const reverse_const_iterator&);
+          reverse_const_iterator(reverse_const_iterator&&) noexcept;
+          ~reverse_const_iterator();
+
+          reverse_const_iterator& operator = (const reverse_const_iterator&);
+          reverse_const_iterator& operator = (reverse_const_iterator&&) noexcept;
+          bool operator != (const reverse_const_iterator&) const noexcept;
+          bool operator == (const reverse_const_iterator&) const noexcept;
+          reverse_const_iterator& operator ++ ();
+          reverse_const_iterator& operator ++ (int);
+          reverse_const_iterator& operator -- ();
+          reverse_const_iterator& operator -- (int);
+          const char& operator * () const;
+
+      };
+
+      reverse_const_iterator crbegin();
+      reverse_const_iterator crend();
   };
 } //kapil
 
