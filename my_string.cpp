@@ -518,4 +518,229 @@ namespace kapil {
   iterator string::end() {
     return iterator(this, sz_);
   }
+
+
+
+  using const_iterator = string::const_iterator;
+
+  const_iterator::const_iterator(const string* str, size_t index)
+    : str_{str}, index_{index} {
+  }
+
+  const_iterator::const_iterator(const const_iterator& itr)
+    : str_{itr.str_}, index_{itr.index_} {
+  }
+
+  const_iterator::const_iterator(const_iterator&& rval) noexcept
+    : str_{rval.str_}, index_{rval.index_} {
+  }
+
+  const_iterator::~const_iterator() {
+    str_ = nullptr;
+    index_ = 0;
+  }
+
+
+
+  const_iterator& const_iterator::operator = (const const_iterator& rhs) {
+    str_ = rhs.str_;
+    index_ = rhs.index_;
+    return *this;
+  }
+
+  const_iterator& const_iterator::operator = (const_iterator&& rhs) noexcept {
+    str_ = rhs.str_;
+    index_ = rhs.index_;
+    return *this;
+  }
+
+  bool const_iterator::operator != (const const_iterator& rhs) const noexcept {
+    return (str_ != rhs.str_) || (index_ != rhs.index_); 
+  }
+
+  bool const_iterator::operator == (const const_iterator& rhs) const noexcept {
+    return (str_ == rhs.str_) && (index_ == rhs.index_);
+  }
+
+  const_iterator& const_iterator::operator ++ () {
+    ++index_;
+    return *this;
+  }
+
+  const_iterator& const_iterator::operator ++ (int dummy) {
+    ++(*this);
+    return *this;
+  }
+
+  const_iterator& const_iterator::operator -- () {
+    --index_;
+    return *this;
+  }
+
+  const_iterator& const_iterator::operator -- (int dummy) {
+    --(*this);
+    return *this;
+  }
+
+  const char& const_iterator::operator * () const {
+    return (*str_)[index_];
+  }
+
+  const_iterator string::cbegin() {
+    return const_iterator(this);
+  }
+
+  const_iterator string::cend() {
+    return const_iterator(this, sz_);
+  }
+
+
+
+  using reverse_iterator = string::reverse_iterator;
+
+  reverse_iterator::reverse_iterator(string *str, size_t index)
+    : str_{str}, index_{index} {
+  }
+
+  reverse_iterator::reverse_iterator(const reverse_iterator& itr)
+    : str_{itr.str_}, index_{itr.index_} {
+  }
+
+  reverse_iterator::reverse_iterator(reverse_iterator&& rval) noexcept
+    : str_{rval.str_}, index_{rval.index_} {
+  }
+
+  reverse_iterator::~reverse_iterator() {
+    str_ = nullptr;
+    index_ = 0;
+  }
+
+
+
+  reverse_iterator& reverse_iterator::operator = (const reverse_iterator& rhs) {
+    str_ = rhs.str_;
+    index_ = rhs.index_;
+    return *this;
+  }
+
+  reverse_iterator& reverse_iterator::operator = (reverse_iterator&& rhs) noexcept {
+    str_ = rhs.str_;
+    index_ = rhs.index_;
+    return *this;
+  }
+
+  bool reverse_iterator::operator != (const reverse_iterator& rhs) const noexcept {
+    return (str_ != rhs.str_) || (index_ != rhs.index_); 
+  }
+
+  bool reverse_iterator::operator == (const reverse_iterator& rhs) const noexcept {
+    return (str_ == rhs.str_) && (index_ == rhs.index_);
+  }
+
+  reverse_iterator& reverse_iterator::operator ++ () {
+    --index_;
+    return *this;
+  }
+
+  reverse_iterator& reverse_iterator::operator ++ (int dummy) {
+    ++(*this);
+    return *this;
+  }
+
+  reverse_iterator& reverse_iterator::operator -- () {
+    ++index_;
+    return *this;
+  }
+
+  reverse_iterator& reverse_iterator::operator -- (int dummy) {
+    --(*this);
+    return *this;
+  }
+
+  char& reverse_iterator::operator * () const {
+    return (*str_)[index_];
+  }
+
+  reverse_iterator string::rbegin() {
+    return reverse_iterator(this, sz_ - 1);
+  }
+
+  reverse_iterator string::rend() {
+    return reverse_iterator(this, -1);
+  }
+
+
+
+  using reverse_const_iterator = string::reverse_const_iterator;
+
+  reverse_const_iterator::reverse_const_iterator(const string* str, size_t index)
+    : str_{str}, index_{index} {
+  }
+
+  reverse_const_iterator::reverse_const_iterator(const reverse_const_iterator& itr)
+    : str_{itr.str_}, index_{itr.index_} {
+  }
+
+  reverse_const_iterator::reverse_const_iterator(reverse_const_iterator&& rval) noexcept
+    : str_{rval.str_}, index_{rval.index_} {
+  }
+
+  reverse_const_iterator::~reverse_const_iterator() {
+    str_ = nullptr;
+    index_ = 0;
+  }
+
+
+
+  reverse_const_iterator& reverse_const_iterator::operator = (const reverse_const_iterator& rhs) {
+    str_ = rhs.str_;
+    index_ = rhs.index_;
+    return *this;
+  }
+
+  reverse_const_iterator& reverse_const_iterator::operator = (reverse_const_iterator&& rhs) noexcept {
+    str_ = rhs.str_;
+    index_ = rhs.index_;
+    return *this;
+  }
+
+  bool reverse_const_iterator::operator != (const reverse_const_iterator& rhs) const noexcept {
+    return (str_ != rhs.str_) || (index_ != rhs.index_); 
+  }
+
+  bool reverse_const_iterator::operator == (const reverse_const_iterator& rhs) const noexcept {
+    return (str_ == rhs.str_) && (index_ == rhs.index_);
+  }
+
+  reverse_const_iterator& reverse_const_iterator::operator ++ () {
+    --index_;
+    return *this;
+  }
+
+  reverse_const_iterator& reverse_const_iterator::operator ++ (int dummy) {
+    ++(*this);
+    return *this;
+  }
+
+  reverse_const_iterator& reverse_const_iterator::operator -- () {
+    ++index_;
+    return *this;
+  }
+
+  reverse_const_iterator& reverse_const_iterator::operator -- (int dummy) {
+    --(*this);
+    return *this;
+  }
+
+  const char& reverse_const_iterator::operator * () const {
+    return (*str_)[index_];
+  }
+
+  reverse_const_iterator string::crbegin() {
+    return reverse_const_iterator(this, sz_ - 1);
+  }
+
+  reverse_const_iterator string::crend() {
+    return reverse_const_iterator(this, -1);
+  }
 } //kapil
