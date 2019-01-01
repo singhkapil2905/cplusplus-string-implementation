@@ -6,19 +6,22 @@
 #include <memory>
 #include <algorithm>
 #include <stdexcept>
+#include <limits>
 
 namespace kapil {
   class string final {
     private:
-      std::unique_ptr<char[]> ptr_;
+      static constexpr size_t default_capacity_ = 16;
+      size_t current_capacity_;
       size_t sz_;
+      std::unique_ptr<char[]> ptr_;
     public:
-      string() noexcept;
+      string();
       string(const string&);
       string(string&&) noexcept;
       explicit string(const char*);
       explicit string(char);
-      ~string();
+      ~string() noexcept;
 
       size_t size() const noexcept;
       size_t length() const noexcept;
@@ -69,30 +72,30 @@ namespace kapil {
       friend string operator + (char, const string&);
       friend string operator + (string&&, char);
       friend string operator + (char, string&&);
-      friend bool operator == (const string&, const string&);
-      friend bool operator == (const string&, const char*);
-      friend bool operator == (const char*, const string&);
-      friend bool operator == (const string&, char);
-      friend bool operator == (char, const string&);
-      friend bool operator == (const string&, string&&);
-      friend bool operator == (string&&, const string&);
-      friend bool operator == (string&&, string&&);
-      friend bool operator == (string&&, char);
-      friend bool operator == (char, string&&);
-      friend bool operator == (const char*, string&&);
-      friend bool operator == (string&&, const char*);
-      friend bool operator != (const string&, const string&);
-      friend bool operator != (const string&, const char*);
-      friend bool operator != (const char*, const string&);
-      friend bool operator != (const string&, char);
-      friend bool operator != (char, const string&);
-      friend bool operator != (const string&, string&&);
-      friend bool operator != (string&&, const string&);
-      friend bool operator != (string&&, string&&);
-      friend bool operator != (string&&, char);
-      friend bool operator != (char, string&&);
-      friend bool operator != (const char*, string&&);
-      friend bool operator != (string&&, const char*);
+      friend bool operator == (const string&, const string&) noexcept;
+      friend bool operator == (const string&, const char*) noexcept;
+      friend bool operator == (const char*, const string&) noexcept;
+      friend bool operator == (const string&, char) noexcept;
+      friend bool operator == (char, const string&) noexcept;
+      friend bool operator == (const string&, string&&) noexcept;
+      friend bool operator == (string&&, const string&) noexcept;
+      friend bool operator == (string&&, string&&) noexcept;
+      friend bool operator == (string&&, char) noexcept;
+      friend bool operator == (char, string&&) noexcept;
+      friend bool operator == (const char*, string&&) noexcept;
+      friend bool operator == (string&&, const char*) noexcept;
+      friend bool operator != (const string&, const string&) noexcept;
+      friend bool operator != (const string&, const char*) noexcept;
+      friend bool operator != (const char*, const string&) noexcept;
+      friend bool operator != (const string&, char) noexcept;
+      friend bool operator != (char, const string&) noexcept;
+      friend bool operator != (const string&, string&&) noexcept;
+      friend bool operator != (string&&, const string&) noexcept;
+      friend bool operator != (string&&, string&&) noexcept;
+      friend bool operator != (string&&, char) noexcept;
+      friend bool operator != (char, string&&) noexcept;
+      friend bool operator != (const char*, string&&) noexcept;
+      friend bool operator != (string&&, const char*) noexcept;
 
       class iterator
       {
@@ -100,21 +103,20 @@ namespace kapil {
           string* str_;
           size_t index_;
         public:
-          iterator(string* = nullptr, size_t = 0);
-          iterator(const iterator&);
+          iterator(string* = nullptr, size_t = 0) noexcept;
+          iterator(const iterator&) noexcept;
           iterator(iterator&&) noexcept;
-          ~iterator();
+          ~iterator() noexcept;
 
-          iterator& operator = (const iterator&);
+          iterator& operator = (const iterator&) noexcept;
           iterator& operator = (iterator&&) noexcept;
           bool operator != (const iterator&) const noexcept;
           bool operator == (const iterator&) const noexcept;
-          iterator& operator ++ ();
-          iterator& operator ++ (int);
-          iterator& operator -- ();
-          iterator& operator -- (int);
+          iterator& operator ++ () noexcept;
+          iterator& operator ++ (int) noexcept;
+          iterator& operator -- () noexcept;
+          iterator& operator -- (int) noexcept;
           char& operator * () const;
-
       };
 
       iterator begin();
@@ -126,21 +128,20 @@ namespace kapil {
           const string* str_;
           size_t index_;
         public:
-          const_iterator(const string* = nullptr, size_t = 0);
-          const_iterator(const const_iterator&);
+          const_iterator(const string*, size_t) noexcept;
+          const_iterator(const const_iterator&) noexcept;
           const_iterator(const_iterator&&) noexcept;
-          ~const_iterator();
+          ~const_iterator() noexcept;
 
-          const_iterator& operator = (const const_iterator&);
+          const_iterator& operator = (const const_iterator&) noexcept;
           const_iterator& operator = (const_iterator&&) noexcept;
           bool operator != (const const_iterator&) const noexcept;
           bool operator == (const const_iterator&) const noexcept;
-          const_iterator& operator ++ ();
-          const_iterator& operator ++ (int);
-          const_iterator& operator -- ();
-          const_iterator& operator -- (int);
+          const_iterator& operator ++ () noexcept;
+          const_iterator& operator ++ (int) noexcept;
+          const_iterator& operator -- () noexcept;
+          const_iterator& operator -- (int) noexcept;
           const char& operator * () const;
-
       };
 
       const_iterator cbegin();
@@ -152,21 +153,20 @@ namespace kapil {
           string* str_;
           size_t index_;
         public:
-          reverse_iterator(string* = nullptr, size_t = 0);
-          reverse_iterator(const reverse_iterator&);
+          reverse_iterator(string* = nullptr, size_t = 0) noexcept;
+          reverse_iterator(const reverse_iterator&) noexcept;
           reverse_iterator(reverse_iterator&&) noexcept;
-          ~reverse_iterator();
+          ~reverse_iterator() noexcept;
 
-          reverse_iterator& operator = (const reverse_iterator&);
+          reverse_iterator& operator = (const reverse_iterator&) noexcept;
           reverse_iterator& operator = (reverse_iterator&&) noexcept;
           bool operator != (const reverse_iterator&) const noexcept;
           bool operator == (const reverse_iterator&) const noexcept;
-          reverse_iterator& operator ++ ();
-          reverse_iterator& operator ++ (int);
-          reverse_iterator& operator -- ();
-          reverse_iterator& operator -- (int);
+          reverse_iterator& operator ++ () noexcept;
+          reverse_iterator& operator ++ (int) noexcept;
+          reverse_iterator& operator -- () noexcept;
+          reverse_iterator& operator -- (int) noexcept;
           char& operator * () const;
-
       };
 
       reverse_iterator rbegin();
@@ -178,21 +178,20 @@ namespace kapil {
           const string* str_;
           size_t index_;
         public:
-          reverse_const_iterator(const string* = nullptr, size_t = 0);
-          reverse_const_iterator(const reverse_const_iterator&);
+          reverse_const_iterator(const string*, size_t) noexcept;
+          reverse_const_iterator(const reverse_const_iterator&) noexcept;
           reverse_const_iterator(reverse_const_iterator&&) noexcept;
-          ~reverse_const_iterator();
+          ~reverse_const_iterator() noexcept;
 
-          reverse_const_iterator& operator = (const reverse_const_iterator&);
+          reverse_const_iterator& operator = (const reverse_const_iterator&) noexcept;
           reverse_const_iterator& operator = (reverse_const_iterator&&) noexcept;
           bool operator != (const reverse_const_iterator&) const noexcept;
           bool operator == (const reverse_const_iterator&) const noexcept;
-          reverse_const_iterator& operator ++ ();
-          reverse_const_iterator& operator ++ (int);
-          reverse_const_iterator& operator -- ();
-          reverse_const_iterator& operator -- (int);
+          reverse_const_iterator& operator ++ () noexcept;
+          reverse_const_iterator& operator ++ (int) noexcept;
+          reverse_const_iterator& operator -- () noexcept;
+          reverse_const_iterator& operator -- (int) noexcept;
           const char& operator * () const;
-
       };
 
       reverse_const_iterator crbegin();
