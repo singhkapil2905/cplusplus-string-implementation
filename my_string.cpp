@@ -3,38 +3,64 @@
 namespace kapil {
 
 /**************************************** member functions *********************/
+  size_t get_appropriate_capacity(size_t new_string_length) {
+    size_t appropriate_capacity = 16;
+    if ((static_cast<unsigned long>(new_string_length) << 1) > std::numeric_limits<size_t>::max()) {
+      appropriate_capacity = new_string_length;
+    } else {
+      appropriate_capacity = 16;
+      if (appropriate_capacity <= new_string_length) {
+         if (!(new_string_length & (new_string_length - 1))) {
+           appropriate_capacity = new_string_length << 1;
+         } else {
+           while (appropriate_capacity < new_string_length) {
+             appropriate_capacity <<= 1;
+           }
+         }
+      }
+    }
+    return appropriate_capacity;
+  }
 
-  string::string() noexcept {
-    ptr_.reset();
+  string::string() 
+    : current_capacity_{ default_capacity_ } {
     sz_ = 0;
+    ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
+    ptr_.get()[0] = '\0';
   }
 
   string::string(const string& other) {
+    current_capacity_ = other.current_capacity_;
     sz_ = other.sz_;
-    ptr_ = std::make_unique<char[]>(sz_ + 1);
+    ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
     std::strcpy(ptr_.get(), other.ptr_.get()); 
   }
 
-  string::string(string&& rval) noexcept {
-    sz_ = rval.sz_;
-    ptr_ = std::move(rval.ptr_);
+  string::string(string&& rval) noexcept
+    : current_capacity_{ rval.current_capacity_ },
+      sz_{ rval.sz_ },
+      ptr_{ std::move(rval.ptr_) } {
   }
   
   string::string(const char* c_string) {
-    sz_ = strlen(c_string);
-    ptr_ = std::make_unique<char[]>(sz_ + 1);
+    sz_ = std::strlen(c_string);
+    current_capacity_ = get_appropriate_capacity(sz_);
+    ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
     std::strcpy(ptr_.get(), c_string);
   }
 
   string::string(char ch) {
     sz_ = 1;
-    ptr_ = std::make_unique<char[]>(sz_ + 1);
+    current_capacity_ = default_capacity_;
+    ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
     ptr_.get()[0] = ch;
     ptr_.get()[1] = '\0';
   }
   
   string::~string() noexcept {
-    ptr_.reset();
+    current_capacity_ = 0;
+    sz_ = 0;
+    ptr_.reset(nullptr);
   };
 
 
@@ -53,23 +79,45 @@ namespace kapil {
       return;
     }
 
-    std::unique_ptr<char[]> temp = std::make_unique<char[]>(n + 1);
+    size_t appropriate_capacity = get_appropriate_capacity(n);
 
-    if (n < sz_) {
-      std::strncpy(temp.get(), ptr_.get(), n);
-      temp.get()[n] = '\0';
-    } else if (n > sz_) {
-      std::strncpy(temp.get(), ptr_.get(), sz_);
-      std::fill(temp.get() + sz_, temp.get() + n + 1, ch);
+    std::unique_ptr<char[]> temp;
+    auto resized = bool{false};
+    
+    if (current_capacity_ != appropriate_capacity) {
+      resized = true;
+      current_capacity_ = appropriate_capacity;
+      temp = std::make_unique<char[]>(current_capacity_ + 1);
     }
 
-    ptr_.reset();
+    if (n < sz_) {
+      if (resized) {
+        std::strncpy(temp.get(), ptr_.get(), n);
+        temp.get()[n] = '\0';
+      } else {
+        ptr_.get()[n] = '\0';
+      }
+    } else if (n > sz_) {
+      if (resized) {
+        std::strncpy(temp.get(), ptr_.get(), sz_);
+        std::fill(temp.get() + sz_, temp.get() + n, ch);
+        temp.get()[n] = '\0';
+      } else {
+        std::fill(ptr_.get() + sz_, ptr_.get() + n, ch);
+        ptr_.get()[n] = '\0';
+      }
+    }
+
     sz_ = n;
-    ptr_ = std::move(temp);
+    if (resized) {
+      ptr_ = std::move(temp);
+    }
   }
   
   void string::clear() noexcept {
-    ptr_.reset();
+    current_capacity_ = default_capacity_;
+    ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
+    ptr_.get()[0] = '\0';
     sz_ = 0;
   }
 
@@ -167,87 +215,109 @@ namespace kapil {
   
   string& string::operator = (const string& rhs) {
     if (this != &rhs) {
-      ptr_.reset();
+      if (current_capacity_ != rhs.current_capacity_) {
+        current_capacity_ = rhs.current_capacity_;
+        ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
+      }
       sz_ = rhs.sz_;
-      ptr_ = std::make_unique<char[]>(sz_ + 1);
-      std::strcpy(ptr_.get(), rhs.ptr_.get());
+      std::strcpy(ptr_.get(), rhs.c_str());
     }
     return *this;
   }
 
   string& string::operator = (string&& rval) noexcept {
-    ptr_.reset();
+    current_capacity_ = rval.current_capacity_;
     sz_ = rval.sz_;
     ptr_ = std::move(rval.ptr_);
     return *this;
   }
 
   string& string::operator = (const char* c_string) {
-    ptr_.reset();
-    sz_ = strlen(c_string);
-    ptr_ = std::make_unique<char[]>(sz_ + 1);
+    sz_ = std::strlen(c_string);
+    auto appropriate_capacity = get_appropriate_capacity(sz_);
+    if (current_capacity_ != appropriate_capacity) {
+      current_capacity_ = appropriate_capacity;
+      ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
+    }
     std::strcpy(ptr_.get(), c_string);
     return *this;
   }
 
   string& string::operator = (char ch) {
-    ptr_.reset();
+    current_capacity_ = default_capacity_;
     sz_ = 1;
-    ptr_ = std::make_unique<char[]>(sz_ + 1);
+    ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
     ptr_.get()[0] = ch;
     ptr_.get()[1] = '\0';
     return *this;
   }
 
   string& string::operator += (const string& rhs) {
-    std::unique_ptr<char[]> temp = std::make_unique<char[]>(sz_ + rhs.sz_ + 1);
-    std::strcpy(temp.get(), ptr_.get());
-    std::strcpy(temp.get() + sz_, rhs.ptr_.get());
-    
-    
-    ptr_.reset();
+    std::unique_ptr<char[]> temp;
+    auto appropriate_capacity = get_appropriate_capacity(sz_ + rhs.sz_);
+ 
+    if (current_capacity_ != appropriate_capacity) {
+      current_capacity_ = appropriate_capacity;
+      temp = std::make_unique<char[]>(current_capacity_ + 1);
+      std::strcpy(temp.get(), ptr_.get());
+      ptr_ = std::move(temp);
+    }
+
+    std::strcpy(ptr_.get() + sz_, rhs.c_str());
     sz_ += rhs.sz_;
-    ptr_ = std::move(temp);
 
     return *this;
   }
 
   string& string::operator += (const char* rhs) {
-    size_t rhs_len = std::strlen(rhs);
+    std::unique_ptr<char[]> temp;
+    auto rhs_sz = std::strlen(rhs);
+    auto appropriate_capacity = get_appropriate_capacity(sz_ + rhs_sz);
+ 
+    if (current_capacity_ != appropriate_capacity) {
+      current_capacity_ = appropriate_capacity;
+      temp = std::make_unique<char[]>(current_capacity_ + 1);
+      std::strcpy(temp.get(), ptr_.get());
+      ptr_ = std::move(temp);
+    }
 
-    std::unique_ptr<char[]> temp = std::make_unique<char[]>(sz_ + rhs_len + 1);
-    strcpy(temp.get(), ptr_.get());
-    strcpy(temp.get() + sz_, rhs);
-
-    ptr_.reset();
-    sz_ += rhs_len;
-    ptr_ = std::move(temp);
+    std::strcpy(ptr_.get() + sz_, rhs);
+    sz_ += rhs_sz;
 
     return *this;
   }
 
   string& string::operator += (char ch) {
-    std::unique_ptr<char[]> temp = std::make_unique<char[]>(sz_ + 1 + 1);
-    std::strcpy(temp.get(), ptr_.get());
-    temp.get()[sz_] = ch;
-    temp.get()[sz_ + 1] = '\0';
+    auto appropriate_capacity = get_appropriate_capacity(sz_ + 1);
+    std::unique_ptr<char[]> temp;
 
-    ptr_.reset();
+    if (current_capacity_ != appropriate_capacity) {
+      current_capacity_ = appropriate_capacity;
+      temp = std::make_unique<char[]>(current_capacity_ + 1);
+      strcpy(temp.get(), ptr_.get());
+      ptr_ = std::move(temp);
+    }
+    ptr_.get()[sz_] = ch;
+    ptr_.get()[sz_ + 1] = '\0';
     sz_ += 1;
-    ptr_ = std::move(temp);
 
     return *this;
   }
   
   
   string& string::operator += (string&& rval) {
-    std::unique_ptr<char[]> temp = std::make_unique<char[]>(sz_ + rval.sz_ + 1);
-    std::strcpy(temp.get(), rval.ptr_.get());
-    std::strcpy(temp.get() + sz_, rval.ptr_.get());
+    std::unique_ptr<char[]> temp;
+    auto appropriate_capacity = get_appropriate_capacity(sz_ + rval.sz_);
+ 
+    if (current_capacity_ != appropriate_capacity) {
+      current_capacity_ = appropriate_capacity;
+      temp = std::make_unique<char[]>(current_capacity_ + 1);
+      std::strcpy(temp.get(), ptr_.get());
+      ptr_ = std::move(temp);
+    }
 
-    ptr_.reset();
+    std::strcpy(ptr_.get() + sz_, rval.c_str());
     sz_ += rval.sz_;
-    ptr_ = std::move(temp);
 
     return *this;
   }
@@ -265,11 +335,8 @@ namespace kapil {
 /**************************************** friend operator overloads *********************/
 
   std::ostream& operator << (std::ostream& out, const string& str) {
-    if (str.ptr_ != nullptr) {
-      const char* ch = str.ptr_.get();
-      for (size_t idx{0}; idx < str.size(); ++idx) {
-        out << ch[idx];
-      }
+    if (str.size() > 0) {
+      out.write(str.c_str(), str.size());
     }
     return out;
   }
@@ -346,99 +413,111 @@ namespace kapil {
     return temp;
   }
 
-  bool operator == (const string& lhs, const string& rhs) {
-    return (lhs.sz_ == rhs.sz_) && (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0);
+  bool operator == (const string& lhs, const string& rhs) noexcept {
+    return (lhs.sz_ == rhs.sz_) &&
+           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
   }
 
-  bool operator == (const string& lhs, const char* rhs) {
-    return (lhs.sz_ == std::strlen(rhs)) && (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) == 0);
+  bool operator == (const string& lhs, const char* rhs) noexcept {
+    return (lhs.sz_ == std::strlen(rhs)) &&
+           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) == 0));
   }
 
-  bool operator == (const char* lhs, const string& rhs) {
-    return (strlen(lhs) == rhs.sz_) && (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) == 0);
+  bool operator == (const char* lhs, const string& rhs) noexcept {
+    return (strlen(lhs) == rhs.sz_) &&
+           ((rhs.sz_ == 0) ? true : (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) == 0));
   }
 
-  bool operator == (const string& lhs, char rhs) {
-    return (lhs.sz_ == 1) && (lhs.ptr_.get()[0] == rhs);
+  bool operator == (const string& lhs, char rhs) noexcept {
+    return (lhs.sz_ == 1) &&
+           (lhs.ptr_.get()[0] == rhs);
   }
 
-  bool operator == (char lhs, const string& rhs) {
-    return (rhs.sz_ == 1) && (lhs == rhs.ptr_.get()[0]);
+  bool operator == (char lhs, const string& rhs) noexcept {
+    return (rhs.sz_ == 1) &&
+           (lhs == rhs.ptr_.get()[0]);
   }
 
-  bool operator == (const string& lhs, string&& rhs) {
-    return (lhs.sz_ == rhs.sz_) && (strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0);
+  bool operator == (const string& lhs, string&& rhs) noexcept {
+    return (lhs.sz_ == rhs.sz_) &&
+           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
   }
 
-  bool operator == (string&& lhs, const string& rhs) {
-    return (lhs.sz_ == rhs.sz_) && (strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0);
+  bool operator == (string&& lhs, const string& rhs) noexcept {
+    return (lhs.sz_ == rhs.sz_) &&
+           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
   }
 
-  bool operator == (string&& lhs, string&& rhs) {
-    return (lhs.sz_ == rhs.sz_) && (strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0);
+  bool operator == (string&& lhs, string&& rhs) noexcept {
+    return (lhs.sz_ == rhs.sz_) &&
+           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
   }
 
-  bool operator == (string&& lhs, char rhs) {
-    return (lhs.sz_ == 1) && (lhs.ptr_.get()[0] == rhs);
+  bool operator == (string&& lhs, char rhs) noexcept {
+    return (lhs.sz_ == 1) &&
+           (lhs.ptr_.get()[0] == rhs);
   }
   
-  bool operator == (char lhs, string&& rhs) {
-    return (rhs.sz_ == 1) && (rhs.ptr_.get()[0] == lhs);
+  bool operator == (char lhs, string&& rhs) noexcept {
+    return (rhs.sz_ == 1) &&
+           (rhs.ptr_.get()[0] == lhs);
   }
 
-  bool operator == (string&& lhs, const char* rhs) {
-    return (lhs.sz_ == std::strlen(rhs)) && (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) == 0);
+  bool operator == (string&& lhs, const char* rhs) noexcept {
+    return (lhs.sz_ == std::strlen(rhs)) &&
+           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) == 0));
   }
 
-  bool operator == (const char* lhs, string && rhs) {
-    return (std::strlen(lhs) == rhs.sz_) && (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) == 0);
+  bool operator == (const char* lhs, string && rhs) noexcept {
+    return (std::strlen(lhs) == rhs.sz_) &&
+           ((rhs.sz_ == 0) ? true : (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) == 0));
   }
 
-  bool operator != (const string& lhs, const string& rhs) {
+  bool operator != (const string& lhs, const string& rhs) noexcept {
     return !(lhs == rhs);
   }
 
-  bool operator != (const string& lhs, const char* rhs) {
+  bool operator != (const string& lhs, const char* rhs) noexcept {
     return !(lhs == rhs);
   }
 
-  bool operator != (const char* lhs, const string& rhs) {
+  bool operator != (const char* lhs, const string& rhs) noexcept {
     return !(lhs == rhs);
   }
 
-  bool operator != (const string& lhs, char rhs) {
+  bool operator != (const string& lhs, char rhs) noexcept {
     return !(lhs == rhs);
   }
 
-  bool operator != (char lhs, const string& rhs) {
+  bool operator != (char lhs, const string& rhs) noexcept {
     return !(lhs == rhs);
   }
 
-  bool operator != (const string& lhs, string&& rhs) {
-    return (lhs.sz_ != rhs.sz_) || (strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
+  bool operator != (const string& lhs, string&& rhs) noexcept {
+    return (lhs.sz_ != rhs.sz_) || (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
   }
 
-  bool operator != (string&& lhs, const string& rhs) {
-    return (lhs.sz_ != rhs.sz_) || (strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
+  bool operator != (string&& lhs, const string& rhs) noexcept {
+    return (lhs.sz_ != rhs.sz_) || (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
   }
 
-  bool operator != (string&& lhs, string&& rhs) {
-    return (lhs.sz_ != rhs.sz_) || (strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
+  bool operator != (string&& lhs, string&& rhs) noexcept {
+    return (lhs.sz_ != rhs.sz_) || (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
   }
 
-  bool operator != (string&& lhs, char rhs) {
+  bool operator != (string&& lhs, char rhs) noexcept {
     return (lhs.sz_ != 1) || (lhs.ptr_.get()[0] != rhs);
   }
   
-  bool operator != (char lhs, string&& rhs) {
+  bool operator != (char lhs, string&& rhs) noexcept {
     return (rhs.sz_ != 1) || (rhs.ptr_.get()[0] != lhs);
   }
 
-  bool operator != (string&& lhs, const char* rhs) {
+  bool operator != (string&& lhs, const char* rhs) noexcept {
     return (lhs.sz_ != std::strlen(rhs)) || (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) != 0);
   }
 
-  bool operator != (const char* lhs, string && rhs) {
+  bool operator != (const char* lhs, string && rhs) noexcept {
     return (std::strlen(lhs) != rhs.sz_) || (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) != 0);
   }
 
@@ -448,11 +527,11 @@ namespace kapil {
 
   using iterator = string::iterator;
 
-  iterator::iterator(string *str, size_t index)
+  iterator::iterator(string *str, size_t index) noexcept
     : str_{str}, index_{index} {
   }
 
-  iterator::iterator(const iterator& itr)
+  iterator::iterator(const iterator& itr) noexcept
     : str_{itr.str_}, index_{itr.index_} {
   }
 
@@ -460,14 +539,14 @@ namespace kapil {
     : str_{rval.str_}, index_{rval.index_} {
   }
 
-  iterator::~iterator() {
+  iterator::~iterator() noexcept {
     str_ = nullptr;
     index_ = 0;
   }
 
 
 
-  iterator& iterator::operator = (const iterator& rhs) {
+  iterator& iterator::operator = (const iterator& rhs) noexcept {
     str_ = rhs.str_;
     index_ = rhs.index_;
     return *this;
@@ -487,22 +566,22 @@ namespace kapil {
     return (str_ == rhs.str_) && (index_ == rhs.index_);
   }
 
-  iterator& iterator::operator ++ () {
+  iterator& iterator::operator ++ () noexcept {
     ++index_;
     return *this;
   }
 
-  iterator& iterator::operator ++ (int dummy) {
+  iterator& iterator::operator ++ (int dummy) noexcept {
     ++(*this);
     return *this;
   }
 
-  iterator& iterator::operator -- () {
+  iterator& iterator::operator -- () noexcept {
     --index_;
     return *this;
   }
 
-  iterator& iterator::operator -- (int dummy) {
+  iterator& iterator::operator -- (int dummy) noexcept {
     --(*this);
     return *this;
   }
@@ -523,11 +602,11 @@ namespace kapil {
 
   using const_iterator = string::const_iterator;
 
-  const_iterator::const_iterator(const string* str, size_t index)
+  const_iterator::const_iterator(const string* str, size_t index) noexcept
     : str_{str}, index_{index} {
   }
 
-  const_iterator::const_iterator(const const_iterator& itr)
+  const_iterator::const_iterator(const const_iterator& itr) noexcept
     : str_{itr.str_}, index_{itr.index_} {
   }
 
@@ -535,14 +614,14 @@ namespace kapil {
     : str_{rval.str_}, index_{rval.index_} {
   }
 
-  const_iterator::~const_iterator() {
+  const_iterator::~const_iterator() noexcept {
     str_ = nullptr;
     index_ = 0;
   }
 
 
 
-  const_iterator& const_iterator::operator = (const const_iterator& rhs) {
+  const_iterator& const_iterator::operator = (const const_iterator& rhs) noexcept {
     str_ = rhs.str_;
     index_ = rhs.index_;
     return *this;
@@ -562,22 +641,22 @@ namespace kapil {
     return (str_ == rhs.str_) && (index_ == rhs.index_);
   }
 
-  const_iterator& const_iterator::operator ++ () {
+  const_iterator& const_iterator::operator ++ () noexcept {
     ++index_;
     return *this;
   }
 
-  const_iterator& const_iterator::operator ++ (int dummy) {
+  const_iterator& const_iterator::operator ++ (int dummy) noexcept {
     ++(*this);
     return *this;
   }
 
-  const_iterator& const_iterator::operator -- () {
+  const_iterator& const_iterator::operator -- () noexcept {
     --index_;
     return *this;
   }
 
-  const_iterator& const_iterator::operator -- (int dummy) {
+  const_iterator& const_iterator::operator -- (int dummy) noexcept {
     --(*this);
     return *this;
   }
@@ -587,7 +666,7 @@ namespace kapil {
   }
 
   const_iterator string::cbegin() {
-    return const_iterator(this);
+    return const_iterator(this, 0);
   }
 
   const_iterator string::cend() {
@@ -598,11 +677,11 @@ namespace kapil {
 
   using reverse_iterator = string::reverse_iterator;
 
-  reverse_iterator::reverse_iterator(string *str, size_t index)
+  reverse_iterator::reverse_iterator(string *str, size_t index) noexcept
     : str_{str}, index_{index} {
   }
 
-  reverse_iterator::reverse_iterator(const reverse_iterator& itr)
+  reverse_iterator::reverse_iterator(const reverse_iterator& itr) noexcept
     : str_{itr.str_}, index_{itr.index_} {
   }
 
@@ -610,14 +689,14 @@ namespace kapil {
     : str_{rval.str_}, index_{rval.index_} {
   }
 
-  reverse_iterator::~reverse_iterator() {
+  reverse_iterator::~reverse_iterator() noexcept {
     str_ = nullptr;
     index_ = 0;
   }
 
 
 
-  reverse_iterator& reverse_iterator::operator = (const reverse_iterator& rhs) {
+  reverse_iterator& reverse_iterator::operator = (const reverse_iterator& rhs) noexcept {
     str_ = rhs.str_;
     index_ = rhs.index_;
     return *this;
@@ -637,22 +716,22 @@ namespace kapil {
     return (str_ == rhs.str_) && (index_ == rhs.index_);
   }
 
-  reverse_iterator& reverse_iterator::operator ++ () {
+  reverse_iterator& reverse_iterator::operator ++ () noexcept {
     --index_;
     return *this;
   }
 
-  reverse_iterator& reverse_iterator::operator ++ (int dummy) {
+  reverse_iterator& reverse_iterator::operator ++ (int dummy) noexcept {
     ++(*this);
     return *this;
   }
 
-  reverse_iterator& reverse_iterator::operator -- () {
+  reverse_iterator& reverse_iterator::operator -- () noexcept {
     ++index_;
     return *this;
   }
 
-  reverse_iterator& reverse_iterator::operator -- (int dummy) {
+  reverse_iterator& reverse_iterator::operator -- (int dummy) noexcept {
     --(*this);
     return *this;
   }
@@ -673,11 +752,11 @@ namespace kapil {
 
   using reverse_const_iterator = string::reverse_const_iterator;
 
-  reverse_const_iterator::reverse_const_iterator(const string* str, size_t index)
+  reverse_const_iterator::reverse_const_iterator(const string* str, size_t index) noexcept
     : str_{str}, index_{index} {
   }
 
-  reverse_const_iterator::reverse_const_iterator(const reverse_const_iterator& itr)
+  reverse_const_iterator::reverse_const_iterator(const reverse_const_iterator& itr) noexcept
     : str_{itr.str_}, index_{itr.index_} {
   }
 
@@ -685,14 +764,14 @@ namespace kapil {
     : str_{rval.str_}, index_{rval.index_} {
   }
 
-  reverse_const_iterator::~reverse_const_iterator() {
+  reverse_const_iterator::~reverse_const_iterator() noexcept {
     str_ = nullptr;
     index_ = 0;
   }
 
 
 
-  reverse_const_iterator& reverse_const_iterator::operator = (const reverse_const_iterator& rhs) {
+  reverse_const_iterator& reverse_const_iterator::operator = (const reverse_const_iterator& rhs) noexcept {
     str_ = rhs.str_;
     index_ = rhs.index_;
     return *this;
@@ -712,22 +791,22 @@ namespace kapil {
     return (str_ == rhs.str_) && (index_ == rhs.index_);
   }
 
-  reverse_const_iterator& reverse_const_iterator::operator ++ () {
+  reverse_const_iterator& reverse_const_iterator::operator ++ () noexcept {
     --index_;
     return *this;
   }
 
-  reverse_const_iterator& reverse_const_iterator::operator ++ (int dummy) {
+  reverse_const_iterator& reverse_const_iterator::operator ++ (int dummy) noexcept {
     ++(*this);
     return *this;
   }
 
-  reverse_const_iterator& reverse_const_iterator::operator -- () {
+  reverse_const_iterator& reverse_const_iterator::operator -- () noexcept {
     ++index_;
     return *this;
   }
 
-  reverse_const_iterator& reverse_const_iterator::operator -- (int dummy) {
+  reverse_const_iterator& reverse_const_iterator::operator -- (int dummy) noexcept {
     --(*this);
     return *this;
   }
