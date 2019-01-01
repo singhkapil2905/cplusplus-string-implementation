@@ -11,7 +11,7 @@
 namespace kapil {
   class string final {
     private:
-      static constexpr size_t default_capacity_ = 16;
+      static constexpr size_t default_capacity_ = 16; //undefined behavior if this is less than 2
       size_t current_capacity_;
       size_t sz_;
       std::unique_ptr<char[]> ptr_;
