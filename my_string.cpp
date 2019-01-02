@@ -3,12 +3,11 @@
 namespace kapil {
 
 /**************************************** member functions *********************/
-  size_t get_appropriate_capacity(size_t new_string_length) {
-    size_t appropriate_capacity = 16;
-    if ((static_cast<unsigned long>(new_string_length) << 1) > std::numeric_limits<size_t>::max()) {
+  static std::size_t get_appropriate_capacity(std::size_t new_string_length) noexcept {
+    std::size_t appropriate_capacity = string::get_default_capacity();
+    if ((new_string_length << 1) < new_string_length) {
       appropriate_capacity = new_string_length;
     } else {
-      appropriate_capacity = 16;
       if (appropriate_capacity <= new_string_length) {
          if (!(new_string_length & (new_string_length - 1))) {
            appropriate_capacity = new_string_length << 1;
@@ -33,7 +32,7 @@ namespace kapil {
     current_capacity_ = other.current_capacity_;
     sz_ = other.sz_;
     ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
-    std::strcpy(ptr_.get(), other.ptr_.get()); 
+    std::memcpy(ptr_.get(), other.ptr_.get(), other.sz_ + 1); 
   }
 
   string::string(string&& rval) noexcept
@@ -46,7 +45,7 @@ namespace kapil {
     sz_ = std::strlen(c_string);
     current_capacity_ = get_appropriate_capacity(sz_);
     ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
-    std::strcpy(ptr_.get(), c_string);
+    std::memcpy(ptr_.get(), c_string, sz_ + 1);
   }
 
   string::string(char ch) {
@@ -61,25 +60,37 @@ namespace kapil {
     current_capacity_ = 0;
     sz_ = 0;
     ptr_.reset(nullptr);
-  };
+  }
 
 
 /**************************************** member functions *********************/
-  
-  size_t string::size() const noexcept {
+ 
+  std::size_t string::capacity() const noexcept {
+    return current_capacity_;
+  }
+
+  std::size_t string::get_default_capacity() noexcept {
+    return default_capacity_;
+  }
+
+  std::size_t string::size() const noexcept {
     return sz_;
   }
   
-  size_t string::length() const noexcept {
+  std::size_t string::length() const noexcept {
     return sz_;
   }
 
-  void string::resize(size_t n, char ch) {
+  void string::resize(std::size_t n, char ch) {
+    if (static_cast<int>(n) < 0) {
+      return;
+    }
+
     if (n == sz_) {
       return;
     }
 
-    size_t appropriate_capacity = get_appropriate_capacity(n);
+    std::size_t appropriate_capacity = get_appropriate_capacity(n);
 
     std::unique_ptr<char[]> temp;
     auto resized = bool{false};
@@ -114,7 +125,7 @@ namespace kapil {
     }
   }
   
-  void string::clear() noexcept {
+  void string::clear() {
     current_capacity_ = default_capacity_;
     ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
     ptr_.get()[0] = '\0';
@@ -125,15 +136,15 @@ namespace kapil {
     return sz_ == 0;
   }
 
-  char& string::at(size_t idx) {
-    if (idx < 0 || idx >= sz_) {
+  char& string::at(int idx) {
+    if (idx < 0 || idx >= static_cast<int>(sz_)) {
       throw std::out_of_range{"out of range memory access"};
     }
     return (*this)[idx];
   }
 
-  const char& string::at(size_t idx) const {
-    if (idx < 0 || idx >= sz_) {
+  const char& string::at(int idx) const {
+    if (idx < 0 || idx >= static_cast<int>(sz_)) {
       throw std::out_of_range{"out of range memory access"};
     }
     return (*this)[idx];
@@ -190,15 +201,16 @@ namespace kapil {
     return *this;
   }
 
-  string& string::assign(string&& rhs) {
-    (*this) = rhs;
+  string& string::assign(string&& rhs) noexcept {
+    (*this) = std::move(rhs);
     return *this;
   }
 
   void string::swap(string &str) {
-    string temp{str};
-    str = *this;
-    *this = temp;
+    using std::swap;
+    swap(current_capacity_, str.current_capacity_);
+    swap(sz_, str.sz_);
+    swap(ptr_, str.ptr_);
   }
 
   const char* string::c_str() const noexcept {
@@ -220,7 +232,7 @@ namespace kapil {
         ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
       }
       sz_ = rhs.sz_;
-      std::strcpy(ptr_.get(), rhs.c_str());
+      std::memcpy(ptr_.get(), rhs.c_str(), rhs.sz_ + 1);
     }
     return *this;
   }
@@ -239,7 +251,7 @@ namespace kapil {
       current_capacity_ = appropriate_capacity;
       ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
     }
-    std::strcpy(ptr_.get(), c_string);
+    std::memcpy(ptr_.get(), c_string, sz_ + 1);
     return *this;
   }
 
@@ -259,11 +271,11 @@ namespace kapil {
     if (current_capacity_ != appropriate_capacity) {
       current_capacity_ = appropriate_capacity;
       temp = std::make_unique<char[]>(current_capacity_ + 1);
-      std::strcpy(temp.get(), ptr_.get());
+      std::memcpy(temp.get(), ptr_.get(), sz_);
       ptr_ = std::move(temp);
     }
 
-    std::strcpy(ptr_.get() + sz_, rhs.c_str());
+    std::memcpy(ptr_.get() + sz_, rhs.c_str(), rhs.sz_ + 1);
     sz_ += rhs.sz_;
 
     return *this;
@@ -277,11 +289,11 @@ namespace kapil {
     if (current_capacity_ != appropriate_capacity) {
       current_capacity_ = appropriate_capacity;
       temp = std::make_unique<char[]>(current_capacity_ + 1);
-      std::strcpy(temp.get(), ptr_.get());
+      std::memcpy(temp.get(), ptr_.get(), sz_);
       ptr_ = std::move(temp);
     }
 
-    std::strcpy(ptr_.get() + sz_, rhs);
+    std::memcpy(ptr_.get() + sz_, rhs, rhs_sz + 1);
     sz_ += rhs_sz;
 
     return *this;
@@ -294,7 +306,7 @@ namespace kapil {
     if (current_capacity_ != appropriate_capacity) {
       current_capacity_ = appropriate_capacity;
       temp = std::make_unique<char[]>(current_capacity_ + 1);
-      strcpy(temp.get(), ptr_.get());
+      std::memcpy(temp.get(), ptr_.get(), sz_);
       ptr_ = std::move(temp);
     }
     ptr_.get()[sz_] = ch;
@@ -312,21 +324,21 @@ namespace kapil {
     if (current_capacity_ != appropriate_capacity) {
       current_capacity_ = appropriate_capacity;
       temp = std::make_unique<char[]>(current_capacity_ + 1);
-      std::strcpy(temp.get(), ptr_.get());
+      std::memcpy(temp.get(), ptr_.get(), sz_);
       ptr_ = std::move(temp);
     }
 
-    std::strcpy(ptr_.get() + sz_, rval.c_str());
+    std::memcpy(ptr_.get() + sz_, rval.c_str(), rval.sz_ + 1);
     sz_ += rval.sz_;
 
     return *this;
   }
 
-  char& string::operator [] (size_t idx) {
+  char& string::operator [] (int idx) {
     return ptr_.get()[idx];
   }
 
-  const char& string::operator [] (size_t idx) const {
+  const char& string::operator [] (int idx) const {
     return ptr_.get()[idx];
   }
   
@@ -336,7 +348,7 @@ namespace kapil {
 
   std::ostream& operator << (std::ostream& out, const string& str) {
     if (str.size() > 0) {
-      out.write(str.c_str(), str.size());
+      out.write(str.c_str(), static_cast<std::streamsize>(str.size()));
     }
     return out;
   }
@@ -527,7 +539,7 @@ namespace kapil {
 
   using iterator = string::iterator;
 
-  iterator::iterator(string *str, size_t index) noexcept
+  iterator::iterator(string *str, int index) noexcept
     : str_{str}, index_{index} {
   }
 
@@ -571,9 +583,10 @@ namespace kapil {
     return *this;
   }
 
-  iterator& iterator::operator ++ (int dummy) noexcept {
+  iterator iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     ++(*this);
-    return *this;
+    return temp;
   }
 
   iterator& iterator::operator -- () noexcept {
@@ -581,9 +594,10 @@ namespace kapil {
     return *this;
   }
 
-  iterator& iterator::operator -- (int dummy) noexcept {
+  iterator iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     --(*this);
-    return *this;
+    return temp;
   }
 
   char& iterator::operator * () const {
@@ -595,14 +609,14 @@ namespace kapil {
   }
 
   iterator string::end() {
-    return iterator(this, sz_);
+    return iterator(this, static_cast<int>(sz_));
   }
 
 
 
   using const_iterator = string::const_iterator;
 
-  const_iterator::const_iterator(const string* str, size_t index) noexcept
+  const_iterator::const_iterator(const string* str, int index) noexcept
     : str_{str}, index_{index} {
   }
 
@@ -646,9 +660,10 @@ namespace kapil {
     return *this;
   }
 
-  const_iterator& const_iterator::operator ++ (int dummy) noexcept {
+  const_iterator const_iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     ++(*this);
-    return *this;
+    return temp;
   }
 
   const_iterator& const_iterator::operator -- () noexcept {
@@ -656,28 +671,29 @@ namespace kapil {
     return *this;
   }
 
-  const_iterator& const_iterator::operator -- (int dummy) noexcept {
+  const_iterator const_iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     --(*this);
-    return *this;
+    return temp;
   }
 
   const char& const_iterator::operator * () const {
     return (*str_)[index_];
   }
 
-  const_iterator string::cbegin() {
+  const_iterator string::cbegin() const {
     return const_iterator(this, 0);
   }
 
-  const_iterator string::cend() {
-    return const_iterator(this, sz_);
+  const_iterator string::cend() const {
+    return const_iterator(this, static_cast<int>(sz_));
   }
 
 
 
   using reverse_iterator = string::reverse_iterator;
 
-  reverse_iterator::reverse_iterator(string *str, size_t index) noexcept
+  reverse_iterator::reverse_iterator(string *str, int index) noexcept
     : str_{str}, index_{index} {
   }
 
@@ -721,9 +737,10 @@ namespace kapil {
     return *this;
   }
 
-  reverse_iterator& reverse_iterator::operator ++ (int dummy) noexcept {
+  reverse_iterator reverse_iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     ++(*this);
-    return *this;
+    return temp;
   }
 
   reverse_iterator& reverse_iterator::operator -- () noexcept {
@@ -731,9 +748,10 @@ namespace kapil {
     return *this;
   }
 
-  reverse_iterator& reverse_iterator::operator -- (int dummy) noexcept {
+  reverse_iterator reverse_iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     --(*this);
-    return *this;
+    return temp;
   }
 
   char& reverse_iterator::operator * () const {
@@ -741,7 +759,7 @@ namespace kapil {
   }
 
   reverse_iterator string::rbegin() {
-    return reverse_iterator(this, sz_ - 1);
+    return reverse_iterator(this, static_cast<int>(sz_ - 1));
   }
 
   reverse_iterator string::rend() {
@@ -752,7 +770,7 @@ namespace kapil {
 
   using reverse_const_iterator = string::reverse_const_iterator;
 
-  reverse_const_iterator::reverse_const_iterator(const string* str, size_t index) noexcept
+  reverse_const_iterator::reverse_const_iterator(const string* str, int index) noexcept
     : str_{str}, index_{index} {
   }
 
@@ -796,9 +814,10 @@ namespace kapil {
     return *this;
   }
 
-  reverse_const_iterator& reverse_const_iterator::operator ++ (int dummy) noexcept {
+  reverse_const_iterator reverse_const_iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     ++(*this);
-    return *this;
+    return temp;
   }
 
   reverse_const_iterator& reverse_const_iterator::operator -- () noexcept {
@@ -806,20 +825,25 @@ namespace kapil {
     return *this;
   }
 
-  reverse_const_iterator& reverse_const_iterator::operator -- (int dummy) noexcept {
+  reverse_const_iterator reverse_const_iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+    auto temp = *this;
     --(*this);
-    return *this;
+    return temp;
   }
 
   const char& reverse_const_iterator::operator * () const {
     return (*str_)[index_];
   }
 
-  reverse_const_iterator string::crbegin() {
-    return reverse_const_iterator(this, sz_ - 1);
+  reverse_const_iterator string::crbegin() const {
+    return reverse_const_iterator(this, static_cast<int>(sz_ - 1));
   }
 
-  reverse_const_iterator string::crend() {
+  reverse_const_iterator string::crend() const {
     return reverse_const_iterator(this, -1);
+  }
+
+  void swap(string& lhs, string& rhs) noexcept {
+    lhs.swap(rhs);
   }
 } //kapil
