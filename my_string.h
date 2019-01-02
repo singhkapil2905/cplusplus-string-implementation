@@ -11,25 +11,27 @@
 namespace kapil {
   class string final {
     private:
-      static constexpr size_t default_capacity_ = 16; //undefined behavior if this is less than 2
-      size_t current_capacity_;
-      size_t sz_;
+      static constexpr std::size_t default_capacity_ = 16;
+      std::size_t current_capacity_;
+      std::size_t sz_;
       std::unique_ptr<char[]> ptr_;
     public:
       string();
       string(const string&);
       string(string&&) noexcept;
-      explicit string(const char*);
+      string(const char*);
       explicit string(char);
       ~string() noexcept;
 
-      size_t size() const noexcept;
-      size_t length() const noexcept;
-      void resize(size_t, char ch = '\0');
-      void clear() noexcept;
+      std::size_t capacity() const noexcept;
+      static std::size_t get_default_capacity() noexcept;
+      std::size_t size() const noexcept;
+      std::size_t length() const noexcept;
+      void resize(std::size_t, char ch = '\0');
+      void clear();
       bool empty() const noexcept;
-      char& at(size_t);
-      const char& at(size_t) const;
+      char& at(int);
+      const char& at(int) const;
       char& back();
       const char& back() const;
       char& front();
@@ -41,7 +43,7 @@ namespace kapil {
       void push_back(char);
       string& assign(const string&);
       string& assign(const char*);
-      string& assign(string&&);
+      string& assign(string&&) noexcept;
       void swap(string&);
       const char* c_str() const noexcept;
       const char* data() const noexcept;
@@ -56,8 +58,8 @@ namespace kapil {
       string& operator += (const char*);
       string& operator += (char);
       string& operator += (string&&);
-      char& operator[] (size_t);
-      const char& operator[] (size_t) const;
+      char& operator[] (int);
+      const char& operator[] (int) const;
 
       friend std::ostream& operator << (std::ostream&, const string&);
       friend string operator + (const string&, const string&);
@@ -101,9 +103,9 @@ namespace kapil {
       {
         private:
           string* str_;
-          size_t index_;
+          int index_;
         public:
-          iterator(string* = nullptr, size_t = 0) noexcept;
+          iterator(string* = nullptr, int = 0) noexcept;
           iterator(const iterator&) noexcept;
           iterator(iterator&&) noexcept;
           ~iterator() noexcept;
@@ -113,9 +115,9 @@ namespace kapil {
           bool operator != (const iterator&) const noexcept;
           bool operator == (const iterator&) const noexcept;
           iterator& operator ++ () noexcept;
-          iterator& operator ++ (int) noexcept;
+          iterator operator ++ (int) noexcept;
           iterator& operator -- () noexcept;
-          iterator& operator -- (int) noexcept;
+          iterator operator -- (int) noexcept;
           char& operator * () const;
       };
 
@@ -126,9 +128,9 @@ namespace kapil {
       {
         private:
           const string* str_;
-          size_t index_;
+          int index_;
         public:
-          const_iterator(const string*, size_t) noexcept;
+          const_iterator(const string*, int) noexcept;
           const_iterator(const const_iterator&) noexcept;
           const_iterator(const_iterator&&) noexcept;
           ~const_iterator() noexcept;
@@ -138,22 +140,22 @@ namespace kapil {
           bool operator != (const const_iterator&) const noexcept;
           bool operator == (const const_iterator&) const noexcept;
           const_iterator& operator ++ () noexcept;
-          const_iterator& operator ++ (int) noexcept;
+          const_iterator operator ++ (int) noexcept;
           const_iterator& operator -- () noexcept;
-          const_iterator& operator -- (int) noexcept;
+          const_iterator operator -- (int) noexcept;
           const char& operator * () const;
       };
 
-      const_iterator cbegin();
-      const_iterator cend();
+      const_iterator cbegin() const;
+      const_iterator cend() const;
 
       class reverse_iterator
       {
         private:
           string* str_;
-          size_t index_;
+          int index_;
         public:
-          reverse_iterator(string* = nullptr, size_t = 0) noexcept;
+          reverse_iterator(string* = nullptr, int = 0) noexcept;
           reverse_iterator(const reverse_iterator&) noexcept;
           reverse_iterator(reverse_iterator&&) noexcept;
           ~reverse_iterator() noexcept;
@@ -163,9 +165,9 @@ namespace kapil {
           bool operator != (const reverse_iterator&) const noexcept;
           bool operator == (const reverse_iterator&) const noexcept;
           reverse_iterator& operator ++ () noexcept;
-          reverse_iterator& operator ++ (int) noexcept;
+          reverse_iterator operator ++ (int) noexcept;
           reverse_iterator& operator -- () noexcept;
-          reverse_iterator& operator -- (int) noexcept;
+          reverse_iterator operator -- (int) noexcept;
           char& operator * () const;
       };
 
@@ -176,9 +178,9 @@ namespace kapil {
       {
         private:
           const string* str_;
-          size_t index_;
+          int index_;
         public:
-          reverse_const_iterator(const string*, size_t) noexcept;
+          reverse_const_iterator(const string*, int) noexcept;
           reverse_const_iterator(const reverse_const_iterator&) noexcept;
           reverse_const_iterator(reverse_const_iterator&&) noexcept;
           ~reverse_const_iterator() noexcept;
@@ -188,15 +190,16 @@ namespace kapil {
           bool operator != (const reverse_const_iterator&) const noexcept;
           bool operator == (const reverse_const_iterator&) const noexcept;
           reverse_const_iterator& operator ++ () noexcept;
-          reverse_const_iterator& operator ++ (int) noexcept;
+          reverse_const_iterator operator ++ (int) noexcept;
           reverse_const_iterator& operator -- () noexcept;
-          reverse_const_iterator& operator -- (int) noexcept;
+          reverse_const_iterator operator -- (int) noexcept;
           const char& operator * () const;
       };
 
-      reverse_const_iterator crbegin();
-      reverse_const_iterator crend();
+      reverse_const_iterator crbegin() const;
+      reverse_const_iterator crend() const;
   };
+  void swap(string&, string&) noexcept;
 } //kapil
 
 #endif
