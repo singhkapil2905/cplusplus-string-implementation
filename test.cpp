@@ -15,79 +15,22 @@ int main() {
   x += " operator +";
   x += y;
 
-  std::cout << " x : " << x << "  \n y : " << y << std::endl;
+  std::cout << " x : " << x << "  x cap : " << x.capacity() << "\n y : " << y << "  y cap : " << y.capacity() << std::endl;
   string added = "i am binary + " + y + string{" ravl add "} + 'x';
-  std::cout << " added : " << added << std::endl;
-/*  string x1{"hey man"};
-  std::cout << x1;
-  
-  std::cout << " start : \n";
-  //string s98 = string{"hello"} + string{" brother"};
-  std::cout << " start : \n";
-  string s1{"hello"};
-  string s2;
-  s2 = std::move(s1);
-  string s3 = string{"brother"};
-  string s4{s3};
-  string s5{""};
-  s5 = "batloluaaa";
-  s5 += s3;
-  s3 += " i am added to s3 as const char*";
-  s4 += string{" i am added as rval "};
-  s4 = s3 + s5 + " s3 + s5";
-  s3 = s5 + " i am s5 + const char*";
-  s2 = " i am const char* + s5" + s5;
-  s1 = s2 + 'a';
-  s1 = "kapil";
-  s1[0] = 's';
-  s1.back() = '$';
-  s1.at(3) = '*';
-  s1.front() = '~';
-  s1.append('f');
-  s1.append("aswd");
-  s1.assign("char* assigned");
-  s3.assign(s2);
-  std::cout << "\n should call move \n";
-  s4.assign(string{"moved"});
-  std::cout << "\n called move \n";
-  s4.swap(s1);
-  std::cout << "\n start of loop \n";
+  std::cout << " added : " << added << " added cap : " << added.capacity() << std::endl;
+  added = "kapil";
+  added.resize(10, 'k');
+  std::cout << " added resize 10 : " << added << " added cap : " << added.capacity() << std::endl;
+  added.resize(78, 'l');
+  std::cout << " added resize 78 : " << added << " added cap : " << added.capacity() << std::endl;
+  string s1 = "kapil";
+  s1.swap(added);
+  std::cout << " added : " << added << " s1 : " << s1 << std::endl;
+
   for (auto it : s1) {
-    std::cout << it;
-  }
-  std::cout << "\n end of loop \n";
-
-  if (s1 != s4) {
-    std::cout << " s1 != s2 \n";
+    std::cout << it << " ";
   }
 
-  s2 = s4 = {"same"};
-
-  if (s2 == s4) {
-    std::cout <<" s2 == s4 and same \n";
-  }
-
-  auto it53 = s2.cbegin();
-  auto it75 = s2.cbegin();
-  it75 = it53;
-
-  std::cout << "\n reverse loop start \n";
-  for (auto it = s2.rbegin(); it != s2.rend(); ++it) {
-    std::cout << *it;
-  }
-  std::cout << "\n reverse loop end \n";
-  std::cout << "\n const reverse loop start \n";
-  for (auto it = s2.crbegin(); it != s2.crend(); ++it) {
-    std::cout << *it;
-  }
-  std::cout << "\n const reverse loop end \n";
-
-  std::cout << " s1 : " << s1 << std::endl << " s2 : " << s2 << std::endl << " s3 : " << s3 << std::endl << " s4 : " << s4 << std::endl << " s5 : " << s5 << std::endl;
-
-  s1 = s2;
-
-  if (s1 == string{s2}) {
-    std::cout << " s1 is same as temp s2 \n";
-  }*/
+  std::cout << "\n";
   return 0;
 }
