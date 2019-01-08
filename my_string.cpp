@@ -561,7 +561,7 @@ namespace kapil {
     return *this;
   }
 
-  iterator iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+  iterator iterator::operator ++ (int) noexcept {
     auto temp = *this;
     ++(*this);
     return temp;
@@ -572,7 +572,7 @@ namespace kapil {
     return *this;
   }
 
-  iterator iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+  iterator iterator::operator -- (int) noexcept {
     auto temp = *this;
     --(*this);
     return temp;
@@ -638,7 +638,7 @@ namespace kapil {
     return *this;
   }
 
-  const_iterator const_iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+  const_iterator const_iterator::operator ++ (int) noexcept {
     auto temp = *this;
     ++(*this);
     return temp;
@@ -649,7 +649,7 @@ namespace kapil {
     return *this;
   }
 
-  const_iterator const_iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+  const_iterator const_iterator::operator -- (int) noexcept {
     auto temp = *this;
     --(*this);
     return temp;
@@ -715,7 +715,7 @@ namespace kapil {
     return *this;
   }
 
-  reverse_iterator reverse_iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+  reverse_iterator reverse_iterator::operator ++ (int) noexcept {
     auto temp = *this;
     ++(*this);
     return temp;
@@ -726,7 +726,7 @@ namespace kapil {
     return *this;
   }
 
-  reverse_iterator reverse_iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+  reverse_iterator reverse_iterator::operator -- (int) noexcept {
     auto temp = *this;
     --(*this);
     return temp;
@@ -792,7 +792,7 @@ namespace kapil {
     return *this;
   }
 
-  reverse_const_iterator reverse_const_iterator::operator ++ (int dummy [[gnu::unused]]) noexcept {
+  reverse_const_iterator reverse_const_iterator::operator ++ (int) noexcept {
     auto temp = *this;
     ++(*this);
     return temp;
@@ -803,7 +803,7 @@ namespace kapil {
     return *this;
   }
 
-  reverse_const_iterator reverse_const_iterator::operator -- (int dummy [[gnu::unused]]) noexcept {
+  reverse_const_iterator reverse_const_iterator::operator -- (int) noexcept {
     auto temp = *this;
     --(*this);
     return temp;
