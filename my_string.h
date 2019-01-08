@@ -11,7 +11,7 @@
 namespace kapil {
   class string final {
     private:
-      static constexpr std::size_t default_capacity_ = 16;
+      static constexpr std::size_t default_capacity_ = 0;
       std::size_t current_capacity_;
       std::size_t sz_;
       std::unique_ptr<char[]> ptr_;
@@ -19,7 +19,7 @@ namespace kapil {
       string();
       string(const string&);
       string(string&&) noexcept;
-      string(const char*);
+      string(const char*);  // Undefined behavior if the input parameter is nullptr.
       explicit string(char);
       ~string() noexcept;
 
@@ -27,22 +27,22 @@ namespace kapil {
       static std::size_t get_default_capacity() noexcept;
       std::size_t size() const noexcept;
       std::size_t length() const noexcept;
-      void resize(std::size_t, char ch = '\0');
+      void resize(std::size_t, char ch = '\0'); // String remains unchanged if new size < 0.
       void clear();
       bool empty() const noexcept;
-      char& at(int);
-      const char& at(int) const;
+      char& at(size_t);
+      const char& at(size_t) const;
       char& back();
       const char& back() const;
       char& front();
       const char& front() const;
       string& append(const string&);
-      string& append(const char*);
+      string& append(const char*);  // undefined behavior if the input parameter is nullptr.
       string& append(string&&);
       string& append(char);
       void push_back(char);
       string& assign(const string&);
-      string& assign(const char*);
+      string& assign(const char*);  // undefined behavior if the input parameter is nullptr.
       string& assign(string&&) noexcept;
       void swap(string&);
       const char* c_str() const noexcept;
@@ -52,22 +52,22 @@ namespace kapil {
       
       string& operator = (const string&);
       string& operator = (string&&) noexcept;
-      string& operator = (const char*);
+      string& operator = (const char*);  // undefined behavior if the input parameter is nullptr.
       string& operator = (char);
       string& operator += (const string&);
-      string& operator += (const char*);
+      string& operator += (const char*);  // undefined behavior if the input parameter is nullptr.
       string& operator += (char);
       string& operator += (string&&);
-      char& operator[] (int);
-      const char& operator[] (int) const;
+      char& operator[] (size_t);
+      const char& operator[] (size_t) const;
 
       friend std::ostream& operator << (std::ostream&, const string&);
       friend string operator + (const string&, const string&);
-      friend string operator + (const string&, const char*);
-      friend string operator + (const char*, const string&);
+      friend string operator + (const string&, const char*);  // undefined behavior if the input parameter is nullptr.
+      friend string operator + (const char*, const string&);  // undefined behavior if the input parameter is nullptr.
       friend string operator + (string&&, string&&);
-      friend string operator + (string&&, const char*);
-      friend string operator + (const char*, string&&);
+      friend string operator + (string&&, const char*);  // undefined behavior if the input parameter is nullptr.
+      friend string operator + (const char*, string&&);  // undefined behavior if the input parameter is nullptr.
       friend string operator + (const string&, string&&);
       friend string operator + (string&&, const string&);
       friend string operator + (const string&, char);
@@ -75,8 +75,8 @@ namespace kapil {
       friend string operator + (string&&, char);
       friend string operator + (char, string&&);
       friend bool operator == (const string&, const string&) noexcept;
-      friend bool operator == (const string&, const char*) noexcept;
-      friend bool operator == (const char*, const string&) noexcept;
+      friend bool operator == (const string&, const char*) noexcept;  // undefined behavior if the input parameter is nullptr.
+      friend bool operator == (const char*, const string&) noexcept;  // undefined behavior if the input parameter is nullptr.
       friend bool operator == (const string&, char) noexcept;
       friend bool operator == (char, const string&) noexcept;
       friend bool operator == (const string&, string&&) noexcept;
@@ -84,11 +84,11 @@ namespace kapil {
       friend bool operator == (string&&, string&&) noexcept;
       friend bool operator == (string&&, char) noexcept;
       friend bool operator == (char, string&&) noexcept;
-      friend bool operator == (const char*, string&&) noexcept;
-      friend bool operator == (string&&, const char*) noexcept;
+      friend bool operator == (const char*, string&&) noexcept;  // undefined behavior if the input parameter is nullptr.
+      friend bool operator == (string&&, const char*) noexcept;  // undefined behavior if the input parameter is nullptr.
       friend bool operator != (const string&, const string&) noexcept;
-      friend bool operator != (const string&, const char*) noexcept;
-      friend bool operator != (const char*, const string&) noexcept;
+      friend bool operator != (const string&, const char*) noexcept;  // undefined behavior if the input parameter is nullptr.
+      friend bool operator != (const char*, const string&) noexcept;  // undefined behavior if the input parameter is nullptr.
       friend bool operator != (const string&, char) noexcept;
       friend bool operator != (char, const string&) noexcept;
       friend bool operator != (const string&, string&&) noexcept;
@@ -96,16 +96,16 @@ namespace kapil {
       friend bool operator != (string&&, string&&) noexcept;
       friend bool operator != (string&&, char) noexcept;
       friend bool operator != (char, string&&) noexcept;
-      friend bool operator != (const char*, string&&) noexcept;
-      friend bool operator != (string&&, const char*) noexcept;
+      friend bool operator != (const char*, string&&) noexcept;  // undefined behavior if the input parameter is nullptr.
+      friend bool operator != (string&&, const char*) noexcept;  // undefined behavior if the input parameter is nullptr.
 
       class iterator
       {
         private:
           string* str_;
-          int index_;
+          long int index_;
         public:
-          iterator(string* = nullptr, int = 0) noexcept;
+          iterator(string* = nullptr, long int = 0) noexcept;
           iterator(const iterator&) noexcept;
           iterator(iterator&&) noexcept;
           ~iterator() noexcept;
@@ -128,9 +128,9 @@ namespace kapil {
       {
         private:
           const string* str_;
-          int index_;
+          long int index_;
         public:
-          const_iterator(const string*, int) noexcept;
+          const_iterator(const string*, long int) noexcept;
           const_iterator(const const_iterator&) noexcept;
           const_iterator(const_iterator&&) noexcept;
           ~const_iterator() noexcept;
@@ -153,9 +153,9 @@ namespace kapil {
       {
         private:
           string* str_;
-          int index_;
+          long int index_;
         public:
-          reverse_iterator(string* = nullptr, int = 0) noexcept;
+          reverse_iterator(string* = nullptr, long int = 0) noexcept;
           reverse_iterator(const reverse_iterator&) noexcept;
           reverse_iterator(reverse_iterator&&) noexcept;
           ~reverse_iterator() noexcept;
@@ -178,9 +178,9 @@ namespace kapil {
       {
         private:
           const string* str_;
-          int index_;
+          long int index_;
         public:
-          reverse_const_iterator(const string*, int) noexcept;
+          reverse_const_iterator(const string*, long int) noexcept;
           reverse_const_iterator(const reverse_const_iterator&) noexcept;
           reverse_const_iterator(reverse_const_iterator&&) noexcept;
           ~reverse_const_iterator() noexcept;
