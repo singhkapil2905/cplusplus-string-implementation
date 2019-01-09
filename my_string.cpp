@@ -332,36 +332,6 @@ namespace kapil {
     return temp;
   }
 
-  string operator + (string&& lhs, string&& rhs) {
-    string temp{lhs};
-    temp += rhs;
-    return temp;
-  }
-
-  string operator + (string&& lhs, const char* rhs) {
-    string temp{lhs};
-    temp += rhs;
-    return temp;
-  }
-
-  string operator + (const char* lhs, string&& rhs) {
-    string temp{lhs};
-    temp += rhs;
-    return temp;
-  }
-
-  string operator + (const string& lhs, string&& rhs) {
-    string temp{lhs};
-    temp += rhs;
-    return temp;
-  }
-
-  string operator + (string&& lhs, const string& rhs) {
-    string temp{lhs};
-    temp += rhs;
-    return temp;
-  }
-
   string operator + (const string& lhs, char rhs) {
     string temp{lhs};
     temp += rhs;
@@ -369,18 +339,6 @@ namespace kapil {
   }
 
   string operator + (char lhs, const string& rhs) {
-    string temp{lhs};
-    temp += rhs;
-    return temp;
-  }
-
-  string operator + (string&& lhs, char rhs) {
-    string temp{lhs};
-    temp += rhs;
-    return temp;
-  }
-
-  string operator + (char lhs, string&& rhs) {
     string temp{lhs};
     temp += rhs;
     return temp;
