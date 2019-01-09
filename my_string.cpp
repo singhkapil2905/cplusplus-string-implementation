@@ -208,7 +208,7 @@ namespace kapil {
   
   string& string::operator = (const string& rhs) {
     if (this != &rhs) {
-      if (current_capacity_ != rhs.current_capacity_) {
+      if (current_capacity_ < rhs.sz_) {
         current_capacity_ = rhs.current_capacity_;
         ptr_ = std::make_unique<char[]>(current_capacity_ + 1);
       }
