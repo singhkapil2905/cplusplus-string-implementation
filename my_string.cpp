@@ -295,23 +295,6 @@ namespace kapil {
     return *this;
   }
   
-  
-  string& string::operator += (string&& rval) {
-    auto appropriate_capacity = get_appropriate_capacity(sz_ + rval.sz_);
- 
-    if (current_capacity_ < appropriate_capacity) {
-      current_capacity_ = appropriate_capacity;
-      std::unique_ptr<char[]> temp = std::make_unique<char[]>(current_capacity_ + 1);
-      std::memcpy(temp.get(), ptr_.get(), sz_);
-      ptr_ = std::move(temp);
-    }
-
-    std::memcpy(ptr_.get() + sz_, rval.c_str(), rval.sz_ + 1);
-    sz_ += rval.sz_;
-
-    return *this;
-  }
-
   char& string::operator [] (size_t idx) {
     return ptr_.get()[idx];
   }
