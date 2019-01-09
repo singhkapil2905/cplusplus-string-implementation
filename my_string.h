@@ -39,7 +39,6 @@ namespace kapil {
       const char& front() const;                   // Undefined behavior if string is empty.
       string& append(const string& rhs);
       string& append(const char* rhs);             // Undefined behavior if rhs is nullptr.
-      string& append(string&& rhs);
       string& append(char rhs);
       void push_back(char ch);
       string& assign(const string& str);
