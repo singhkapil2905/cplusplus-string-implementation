@@ -117,14 +117,14 @@ namespace kapil {
     return sz_ == 0;
   }
 
-  char& string::at(size_t idx) {
+  char& string::at(std::size_t idx) {
     if (static_cast<long int>(idx) < 0 || idx >= sz_) {
       throw std::out_of_range{"out of range memory access"};
     }
     return (*this)[idx];
   }
 
-  const char& string::at(size_t idx) const {
+  const char& string::at(std::size_t idx) const {
     if (static_cast<long int>(idx) < 0 || idx >= sz_) {
       throw std::out_of_range{"out of range memory access"};
     }
@@ -290,11 +290,11 @@ namespace kapil {
     return *this;
   }
   
-  char& string::operator [] (size_t idx) {
+  char& string::operator [] (std::size_t idx) {
     return ptr_.get()[idx];
   }
 
-  const char& string::operator [] (size_t idx) const {
+  const char& string::operator [] (std::size_t idx) const {
     return ptr_.get()[idx];
   }
   
@@ -346,9 +346,9 @@ namespace kapil {
 
     const char* lhs_c_string = lhs.c_str();
     const char* rhs_c_string = rhs.c_str();
-    const size_t range_to_compare = lhs.sz_;
+    const std::size_t range_to_compare = lhs.sz_;
 
-    for (size_t idx{0}; idx < range_to_compare; ++idx) {
+    for (std::size_t idx{0}; idx < range_to_compare; ++idx) {
       if (lhs_c_string[idx] != rhs_c_string[idx]) {
         return false;
       }
@@ -359,16 +359,16 @@ namespace kapil {
 
 
   bool operator == (const string& lhs, const char* rhs) noexcept {
-    const size_t rhs_sz = std::strlen(rhs);
+    const std::size_t rhs_sz = std::strlen(rhs);
     if (lhs.sz_ != rhs_sz) {
       return false;
     }
 
     const char* lhs_c_string = lhs.c_str();
     const char* rhs_c_string = rhs;
-    const size_t range_to_compare = lhs.sz_;
+    const std::size_t range_to_compare = lhs.sz_;
 
-    for (size_t idx{0}; idx < range_to_compare; ++idx) {
+    for (std::size_t idx{0}; idx < range_to_compare; ++idx) {
       if (lhs_c_string[idx] != rhs_c_string[idx]) {
         return false;
       }
@@ -379,16 +379,16 @@ namespace kapil {
 
 
   bool operator == (const char* lhs, const string& rhs) noexcept {
-    const size_t lhs_sz = std::strlen(lhs);
+    const std::size_t lhs_sz = std::strlen(lhs);
     if (lhs_sz != rhs.sz_) {
       return false;
     }
 
     const char* lhs_c_string = lhs;
     const char* rhs_c_string = rhs.c_str();
-    const size_t range_to_compare = rhs.sz_;
+    const std::size_t range_to_compare = rhs.sz_;
 
-    for (size_t idx{0}; idx < range_to_compare; ++idx) {
+    for (std::size_t idx{0}; idx < range_to_compare; ++idx) {
       if (lhs_c_string[idx] != rhs_c_string[idx]) {
         return false;
       }
@@ -426,11 +426,11 @@ namespace kapil {
   }
   
   bool operator < (const string& lhs, const string& rhs) noexcept {
-    const size_t range_to_loop = (lhs.sz_ < rhs.sz_) ? lhs.sz_ : rhs.sz_;
+    const std::size_t range_to_loop = (lhs.sz_ < rhs.sz_) ? lhs.sz_ : rhs.sz_;
     const char* lhs_c_string = lhs.c_str();
     const char* rhs_c_string = rhs.c_str();
 
-    for (size_t idx{0}; idx < range_to_loop; ++idx) {
+    for (std::size_t idx{0}; idx < range_to_loop; ++idx) {
       if (lhs_c_string[idx] < rhs_c_string[idx]) {
         return true;
       } else if (lhs_c_string[idx] > rhs_c_string[idx]) {
@@ -447,12 +447,12 @@ namespace kapil {
 
 
   bool operator < (const string& lhs, const char* rhs) noexcept {
-    const size_t rhs_sz = std::strlen(rhs);
-    const size_t range_to_loop = (lhs.sz_ < rhs_sz) ? lhs.sz_ : rhs_sz;
+    const std::size_t rhs_sz = std::strlen(rhs);
+    const std::size_t range_to_loop = (lhs.sz_ < rhs_sz) ? lhs.sz_ : rhs_sz;
     const char* lhs_c_string = lhs.c_str();
     const char* rhs_c_string = rhs;
 
-    for (size_t idx{0}; idx < range_to_loop; ++idx) {
+    for (std::size_t idx{0}; idx < range_to_loop; ++idx) {
       if (lhs_c_string[idx] < rhs_c_string[idx]) {
         return true;
       } else if (lhs_c_string[idx] > rhs_c_string[idx]) {
@@ -469,12 +469,12 @@ namespace kapil {
 
 
   bool operator < (const char* lhs, const string& rhs) noexcept {
-    const size_t lhs_sz = std::strlen(lhs);
-    const size_t range_to_loop = (lhs_sz < rhs.sz_) ? lhs_sz : rhs.sz_;
+    const std::size_t lhs_sz = std::strlen(lhs);
+    const std::size_t range_to_loop = (lhs_sz < rhs.sz_) ? lhs_sz : rhs.sz_;
     const char* lhs_c_string = lhs;
     const char* rhs_c_string = rhs.c_str();
 
-    for (size_t idx{0}; idx < range_to_loop; ++idx) {
+    for (std::size_t idx{0}; idx < range_to_loop; ++idx) {
       if (lhs_c_string[idx] < rhs_c_string[idx]) {
         return true;
       } else if (lhs_c_string[idx] > rhs_c_string[idx]) {
