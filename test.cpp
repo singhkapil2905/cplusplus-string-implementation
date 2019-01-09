@@ -75,6 +75,26 @@ int main() {
 
   string z10 = 'k';
 
+  string z11 = "kapil";
+  string z12 = "kapil";
+  z12 += '\0';
+  z12 += 'k';
+  z11 += '\0';
+  z11 += 'a';
+
+  string z14;
+  z14 = z11 + z12;
+  z11.append(string{"_appended"});
+  z10.assign(string{"_assigned"});
+
+  std::cout  << " z11 : " << z11 << " z12 : " << z12 << std::endl;
+  string z13 = "kapil";
+  z13 += string{" repeat kapil"};
+
+  std::cout << "(z11 < z12)  : " << (z11 < z12) << "  z11 == z12 : " << (z11 == z12) << "  z11 != z12 : " << (z11 != z12) << "  (z11 < strin{arjun} : " << (z11 < string{"zrjun"}) << "  (z11 < x) : " << (z11 < 'x') << " z12 != string{kapila} : " << (z12 != string{"kapila"}) << " z12 > z11 : " << (z12 > z11) << " z12 > string{apple} : " << (z12 > string{"apple"})  <<  " z13 : " << z13 << std::endl;
+
+  std::cout << " (z11 + z12 ) : " << z11 + z12 << " << z11 + string{kapil} : " << z11 + string{"kapil"} << " z10 : " << z10 <<std::endl;
+
 
   string x{"kapil"};
   std::cout << " size : " << x.size() << " length : " << x.length() << " is empty : " << x.empty() << " at 2 : " << x.at(2) << " back : " << 
