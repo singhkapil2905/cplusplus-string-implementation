@@ -58,7 +58,6 @@ namespace kapil {
       string& operator += (const string& rhs);
       string& operator += (const char* rhs);       // Undefined behavior if rhs is nullptr.
       string& operator += (char rhs);
-      string& operator += (string&& rhs);
       char& operator[] (size_t idx);               // Does not check if idx is a valid character index in string.
       const char& operator[] (size_t idx) const;   // Does not check if idx is a valid character index in string.
 
