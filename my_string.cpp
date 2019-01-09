@@ -404,65 +404,71 @@ namespace kapil {
   }
 
   bool operator == (const string& lhs, const string& rhs) noexcept {
-    return (lhs.sz_ == rhs.sz_) &&
-           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
+    if (lhs.sz_ != rhs.sz_) {
+      return false;
+    }
+
+    const char* lhs_c_string = lhs.c_str();
+    const char* rhs_c_string = rhs.c_str();
+    const size_t range_to_compare = lhs.sz_;
+
+    for (size_t idx{0}; idx < range_to_compare; ++idx) {
+      if (lhs_c_string[idx] != rhs_c_string[idx]) {
+        return false;
+      }
+    }
+
+    return true;
   }
+
 
   bool operator == (const string& lhs, const char* rhs) noexcept {
-    return (lhs.sz_ == std::strlen(rhs)) &&
-           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) == 0));
+    const size_t rhs_sz = std::strlen(rhs);
+    if (lhs.sz_ != rhs_sz) {
+      return false;
+    }
+
+    const char* lhs_c_string = lhs.c_str();
+    const char* rhs_c_string = rhs;
+    const size_t range_to_compare = lhs.sz_;
+
+    for (size_t idx{0}; idx < range_to_compare; ++idx) {
+      if (lhs_c_string[idx] != rhs_c_string[idx]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
+
   bool operator == (const char* lhs, const string& rhs) noexcept {
-    return (strlen(lhs) == rhs.sz_) &&
-           ((rhs.sz_ == 0) ? true : (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) == 0));
+    const size_t lhs_sz = std::strlen(lhs);
+    if (lhs_sz != rhs.sz_) {
+      return false;
+    }
+
+    const char* lhs_c_string = lhs;
+    const char* rhs_c_string = rhs.c_str();
+    const size_t range_to_compare = rhs.sz_;
+
+    for (size_t idx{0}; idx < range_to_compare; ++idx) {
+      if (lhs_c_string[idx] != rhs_c_string[idx]) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   bool operator == (const string& lhs, char rhs) noexcept {
-    return (lhs.sz_ == 1) &&
-           (lhs.ptr_.get()[0] == rhs);
+    return (lhs.sz_ == 1) && (lhs.c_str()[0] == rhs);
   }
 
   bool operator == (char lhs, const string& rhs) noexcept {
-    return (rhs.sz_ == 1) &&
-           (lhs == rhs.ptr_.get()[0]);
-  }
-
-  bool operator == (const string& lhs, string&& rhs) noexcept {
-    return (lhs.sz_ == rhs.sz_) &&
-           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
-  }
-
-  bool operator == (string&& lhs, const string& rhs) noexcept {
-    return (lhs.sz_ == rhs.sz_) &&
-           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
-  }
-
-  bool operator == (string&& lhs, string&& rhs) noexcept {
-    return (lhs.sz_ == rhs.sz_) &&
-           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) == 0));
-  }
-
-  bool operator == (string&& lhs, char rhs) noexcept {
-    return (lhs.sz_ == 1) &&
-           (lhs.ptr_.get()[0] == rhs);
+    return (rhs.sz_ == 1) && (lhs == rhs.c_str()[0]);
   }
   
-  bool operator == (char lhs, string&& rhs) noexcept {
-    return (rhs.sz_ == 1) &&
-           (rhs.ptr_.get()[0] == lhs);
-  }
-
-  bool operator == (string&& lhs, const char* rhs) noexcept {
-    return (lhs.sz_ == std::strlen(rhs)) &&
-           ((lhs.sz_ == 0) ? true : (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) == 0));
-  }
-
-  bool operator == (const char* lhs, string && rhs) noexcept {
-    return (std::strlen(lhs) == rhs.sz_) &&
-           ((rhs.sz_ == 0) ? true : (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) == 0));
-  }
-
   bool operator != (const string& lhs, const string& rhs) noexcept {
     return !(lhs == rhs);
   }
@@ -482,36 +488,106 @@ namespace kapil {
   bool operator != (char lhs, const string& rhs) noexcept {
     return !(lhs == rhs);
   }
-
-  bool operator != (const string& lhs, string&& rhs) noexcept {
-    return (lhs.sz_ != rhs.sz_) || (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
-  }
-
-  bool operator != (string&& lhs, const string& rhs) noexcept {
-    return (lhs.sz_ != rhs.sz_) || (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
-  }
-
-  bool operator != (string&& lhs, string&& rhs) noexcept {
-    return (lhs.sz_ != rhs.sz_) || (std::strncmp(lhs.ptr_.get(), rhs.ptr_.get(), lhs.sz_) != 0);
-  }
-
-  bool operator != (string&& lhs, char rhs) noexcept {
-    return (lhs.sz_ != 1) || (lhs.ptr_.get()[0] != rhs);
-  }
   
-  bool operator != (char lhs, string&& rhs) noexcept {
-    return (rhs.sz_ != 1) || (rhs.ptr_.get()[0] != lhs);
+  bool operator < (const string& lhs, const string& rhs) noexcept {
+    const size_t range_to_loop = (lhs.sz_ < rhs.sz_) ? lhs.sz_ : rhs.sz_;
+    const char* lhs_c_string = lhs.c_str();
+    const char* rhs_c_string = rhs.c_str();
+
+    for (size_t idx{0}; idx < range_to_loop; ++idx) {
+      if (lhs_c_string[idx] < rhs_c_string[idx]) {
+        return true;
+      } else if (lhs_c_string[idx] > rhs_c_string[idx]) {
+        return false;
+      }
+    }
+
+    if (lhs.sz_ >= rhs.sz_) {
+      return false;
+    }
+
+    return true;
   }
 
-  bool operator != (string&& lhs, const char* rhs) noexcept {
-    return (lhs.sz_ != std::strlen(rhs)) || (std::strncmp(lhs.ptr_.get(), rhs, lhs.sz_) != 0);
+
+  bool operator < (const string& lhs, const char* rhs) noexcept {
+    const size_t rhs_sz = std::strlen(rhs);
+    const size_t range_to_loop = (lhs.sz_ < rhs_sz) ? lhs.sz_ : rhs_sz;
+    const char* lhs_c_string = lhs.c_str();
+    const char* rhs_c_string = rhs;
+
+    for (size_t idx{0}; idx < range_to_loop; ++idx) {
+      if (lhs_c_string[idx] < rhs_c_string[idx]) {
+        return true;
+      } else if (lhs_c_string[idx] > rhs_c_string[idx]) {
+        return false;
+      }
+    }
+
+    if (lhs.sz_ >= rhs_sz) {
+      return false;
+    }
+
+    return true;
   }
 
-  bool operator != (const char* lhs, string && rhs) noexcept {
-    return (std::strlen(lhs) != rhs.sz_) || (std::strncmp(lhs, rhs.ptr_.get(), rhs.sz_) != 0);
+
+  bool operator < (const char* lhs, const string& rhs) noexcept {
+    const size_t lhs_sz = std::strlen(lhs);
+    const size_t range_to_loop = (lhs_sz < rhs.sz_) ? lhs_sz : rhs.sz_;
+    const char* lhs_c_string = lhs;
+    const char* rhs_c_string = rhs.c_str();
+
+    for (size_t idx{0}; idx < range_to_loop; ++idx) {
+      if (lhs_c_string[idx] < rhs_c_string[idx]) {
+        return true;
+      } else if (lhs_c_string[idx] > rhs_c_string[idx]) {
+        return false;
+      }
+    }
+
+    if (lhs_sz >= rhs.sz_) {
+      return false;
+    }
+
+    return true;
   }
 
+  bool operator < (const string& lhs, char rhs) noexcept {
+    if ((lhs.sz_ == 0) || (lhs.c_str()[0] < rhs)) {
+      return true;
+    }
 
+    return false;
+  }
+
+  bool operator < (char lhs, const string& rhs) noexcept {
+    if ((rhs.sz_ > 0) && (lhs < rhs.c_str()[0])) {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool operator > (const string& lhs, const string& rhs) noexcept {
+    return (lhs != rhs) && (!(lhs < rhs));
+  }
+
+  bool operator > (const string& lhs, const char* rhs) noexcept {
+    return (lhs != rhs) && (!(lhs < rhs));
+  }
+
+  bool operator > (const char* lhs, const string& rhs) noexcept {
+    return (lhs != rhs) && (!(lhs < rhs));
+  }
+
+  bool operator > (const string& lhs, char rhs) noexcept {
+    return (lhs != rhs) && (!(lhs < rhs));
+  }
+
+  bool operator > (char lhs, const string& rhs) noexcept {
+    return (lhs != rhs) && (!(lhs < rhs));
+  }
 
 /**************************************** iterator related implementations *********************/
 
