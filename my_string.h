@@ -31,8 +31,8 @@ namespace kapil {
       void resize(std::size_t sz, char ch = '\0'); // String remains unchanged if new size, sz < 0.
       void clear();
       bool empty() const noexcept;
-      char& at(size_t idx);                        // Throws exception if idx is invalid character index in string.
-      const char& at(size_t idx) const;            // Throws exception if idx is invalid character index in string.
+      char& at(std::size_t idx);                        // Throws exception if idx is invalid character index in string.
+      const char& at(std::size_t idx) const;            // Throws exception if idx is invalid character index in string.
       char& back();                                // Undefined behavior if string is empty.
       const char& back() const;                    // Undefined behavior if string is empty.
       char& front();                               // Undefined behavior if string is empty.
@@ -57,8 +57,8 @@ namespace kapil {
       string& operator += (const string& rhs);
       string& operator += (const char* rhs);       // Undefined behavior if rhs is nullptr.
       string& operator += (char rhs);
-      char& operator[] (size_t idx);               // Does not check if idx is a valid character index in string.
-      const char& operator[] (size_t idx) const;   // Does not check if idx is a valid character index in string.
+      char& operator[] (std::size_t idx);               // Does not check if idx is a valid character index in string.
+      const char& operator[] (std::size_t idx) const;   // Does not check if idx is a valid character index in string.
 
       friend std::ostream& operator << (std::ostream& os, const string& str);
       friend string operator + (const string& lhs, const string& rhs);
