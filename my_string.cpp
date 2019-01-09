@@ -157,11 +157,6 @@ namespace kapil {
     return *this;
   }
 
-  string& string::append(string&& rhs) {
-    (*this) += rhs;
-    return *this;
-  }
-
   string& string::append(char ch) {
     (*this) += ch;
     return *this;
