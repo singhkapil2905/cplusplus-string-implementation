@@ -65,15 +65,8 @@ namespace kapil {
       friend string operator + (const string& lhs, const string& rhs);
       friend string operator + (const string& lhs, const char* rhs);         // Undefined behavior if rhs is nullptr.
       friend string operator + (const char* lhs, const string& rhs);         // Undefined behavior if lhs is nullptr.
-      friend string operator + (string&& lhs, string&& rhs);
-      friend string operator + (string&& lhs, const char* rhs);              // Undefined behavior if rhs is nullptr.
-      friend string operator + (const char* lhs, string&& rhs);              // Undefined behavior if lhs is nullptr.
-      friend string operator + (const string& lhs, string&& rhs);
-      friend string operator + (string&& lhs, const string& rhs);
       friend string operator + (const string& lhs, char rhs);
       friend string operator + (char lhs, const string& rhs);
-      friend string operator + (string&& lhs, char rhs);
-      friend string operator + (char lhs, string&& rhs);
       friend bool operator == (const string& lhs, const string& rhs) noexcept;
       friend bool operator == (const string& lhs, const char* rhs) noexcept; // Undefined behavior if rhs is nullptr.
       friend bool operator == (const char* lhs, const string& rhs) noexcept; // Undefined behavior if lhs is nullptr.
