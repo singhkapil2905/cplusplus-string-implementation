@@ -19,7 +19,7 @@ namespace kapil {
       string();
       string(const string& str);
       string(string&& rval) noexcept;
-      string(const char* c_string);  // Undefined behavior if c_string is nullptr.
+      string(const char* c_string);                // Undefined behavior if c_string is nullptr.
       string(char ch);
       string(int) = delete;
       ~string() noexcept;
@@ -31,19 +31,19 @@ namespace kapil {
       void resize(std::size_t sz, char ch = '\0'); // String remains unchanged if new size, sz < 0.
       void clear();
       bool empty() const noexcept;
-      char& at(size_t idx);
-      const char& at(size_t idx) const;
-      char& back();
-      const char& back() const;
-      char& front();
-      const char& front() const;
+      char& at(size_t idx);                        // Throws exception if idx is invalid character index in string.
+      const char& at(size_t idx) const;            // Throws exception if idx is invalid character index in string.
+      char& back();                                // Undefined behavior if string is empty.
+      const char& back() const;                    // Undefined behavior if string is empty.
+      char& front();                               // Undefined behavior if string is empty.
+      const char& front() const;                   // Undefined behavior if string is empty.
       string& append(const string& rhs);
-      string& append(const char* rhs);  // undefined behavior if the input parameter is nullptr.
+      string& append(const char* rhs);             // Undefined behavior if rhs is nullptr.
       string& append(string&& rhs);
       string& append(char rhs);
       void push_back(char ch);
       string& assign(const string& str);
-      string& assign(const char* c_string);  // undefined behavior if the input parameter is nullptr.
+      string& assign(const char* c_string);        // Undefined behavior if c_string is nullptr.
       string& assign(string&& rval) noexcept;
       void swap(string& str);
       const char* c_str() const noexcept;
@@ -53,22 +53,22 @@ namespace kapil {
       
       string& operator = (const string& rhs);
       string& operator = (string&& rhs) noexcept;
-      string& operator = (const char* rhs);  // undefined behavior if the input parameter is nullptr.
+      string& operator = (const char* rhs);        // Undefined behavior if rhs is nullptr.
       string& operator = (char rhs);
       string& operator += (const string& rhs);
-      string& operator += (const char* rhs);  // undefined behavior if the input parameter is nullptr.
+      string& operator += (const char* rhs);       // Undefined behavior if rhs is nullptr.
       string& operator += (char rhs);
       string& operator += (string&& rhs);
-      char& operator[] (size_t idx);
-      const char& operator[] (size_t idx) const;
+      char& operator[] (size_t idx);               // Does not check if idx is a valid character index in string.
+      const char& operator[] (size_t idx) const;   // Does not check if idx is a valid character index in string.
 
       friend std::ostream& operator << (std::ostream& os, const string& str);
       friend string operator + (const string& lhs, const string& rhs);
-      friend string operator + (const string& lhs, const char* rhs);  // undefined behavior if the input parameter is nullptr.
-      friend string operator + (const char* lhs, const string& rhs);  // undefined behavior if the input parameter is nullptr.
+      friend string operator + (const string& lhs, const char* rhs);         // Undefined behavior if rhs is nullptr.
+      friend string operator + (const char* lhs, const string& rhs);         // Undefined behavior if lhs is nullptr.
       friend string operator + (string&& lhs, string&& rhs);
-      friend string operator + (string&& lhs, const char* rhs);  // undefined behavior if the input parameter is nullptr.
-      friend string operator + (const char* lhs, string&& rhs);  // undefined behavior if the input parameter is nullptr.
+      friend string operator + (string&& lhs, const char* rhs);              // Undefined behavior if rhs is nullptr.
+      friend string operator + (const char* lhs, string&& rhs);              // Undefined behavior if lhs is nullptr.
       friend string operator + (const string& lhs, string&& rhs);
       friend string operator + (string&& lhs, const string& rhs);
       friend string operator + (const string& lhs, char rhs);
@@ -76,29 +76,26 @@ namespace kapil {
       friend string operator + (string&& lhs, char rhs);
       friend string operator + (char lhs, string&& rhs);
       friend bool operator == (const string& lhs, const string& rhs) noexcept;
-      friend bool operator == (const string& lhs, const char* rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
-      friend bool operator == (const char* lhs, const string& rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
+      friend bool operator == (const string& lhs, const char* rhs) noexcept; // Undefined behavior if rhs is nullptr.
+      friend bool operator == (const char* lhs, const string& rhs) noexcept; // Undefined behavior if lhs is nullptr.
       friend bool operator == (const string& lhs, char rhs) noexcept;
       friend bool operator == (char lhs, const string& rhs) noexcept;
-      friend bool operator == (const string& lhs, string&& rhs) noexcept;
-      friend bool operator == (string&& lhs, const string& rhs) noexcept;
-      friend bool operator == (string&& lhs, string&& rhs) noexcept;
-      friend bool operator == (string&& lhs, char rhs) noexcept;
-      friend bool operator == (char lhs, string&& rhs) noexcept;
-      friend bool operator == (const char* lhs, string&& rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
-      friend bool operator == (string&& lhs, const char* rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
       friend bool operator != (const string& lhs, const string& rhs) noexcept;
-      friend bool operator != (const string& lhs, const char* rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
-      friend bool operator != (const char* lhs, const string& rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
+      friend bool operator != (const string& lhs, const char* rhs) noexcept; // Undefined behavior if rhs is nullptr.
+      friend bool operator != (const char* lhs, const string& rhs) noexcept; // Undefined behavior if lhs is nullptr.
       friend bool operator != (const string& lhs, char rhs) noexcept;
       friend bool operator != (char lhs, const string& rhs) noexcept;
-      friend bool operator != (const string& lhs, string&& rhs) noexcept;
-      friend bool operator != (string&& lhs, const string& rhs) noexcept;
-      friend bool operator != (string&& lhs, string&& rhs) noexcept;
-      friend bool operator != (string&& lhs, char rhs) noexcept;
-      friend bool operator != (char lhs, string&& rhs) noexcept;
-      friend bool operator != (const char* lhs, string&& rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
-      friend bool operator != (string&& lhs, const char* rhs) noexcept;  // undefined behavior if the input parameter is nullptr.
+      friend bool operator < (const string& lhs, const string& rhs) noexcept;
+      friend bool operator < (const string& lhs, const char* rhs) noexcept;  // Undefined behavior if rhs is nullptr.
+      friend bool operator < (const char* lhs, const string& rhs) noexcept;  // Undefined behavior if lhs is nullptr.
+      friend bool operator < (const string& lhs, char rhs) noexcept;
+      friend bool operator < (char lhs, const string& rhs) noexcept;
+      friend bool operator > (const string& lhs, const string& rhs) noexcept;
+      friend bool operator > (const string& lhs, const char* rhs) noexcept;  // Undefined behavior if rhs is nullptr.
+      friend bool operator > (const char* lhs, const string& rhs) noexcept;  // Undefined behavior if lhs is nullptr.
+      friend bool operator > (const string& lhs, char rhs) noexcept;
+      friend bool operator > (char lhs, const string& rhs) noexcept;
+
 
       class iterator
       {
