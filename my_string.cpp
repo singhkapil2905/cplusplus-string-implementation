@@ -21,6 +21,8 @@ namespace kapil {
     }
     return appropriate_capacity;
   }
+  
+  /**************************************** member functions *********************/
 
   string::string() 
     : current_capacity_{ default_capacity_ } {
@@ -63,8 +65,6 @@ namespace kapil {
     ptr_.reset(nullptr);
   }
 
-
-/**************************************** member functions *********************/
  
   std::size_t string::capacity() const noexcept {
     return current_capacity_;
