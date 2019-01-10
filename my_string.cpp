@@ -2,7 +2,7 @@
 
 namespace kapil {
 
-/**************************************** member functions *********************/
+/**************************************** helper functions *********************/
   static std::size_t get_appropriate_capacity(std::size_t new_string_length) noexcept {
     std::size_t appropriate_capacity = string::get_default_capacity();
     if ((new_string_length << 1) < new_string_length) {
