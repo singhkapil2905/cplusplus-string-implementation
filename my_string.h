@@ -9,7 +9,7 @@
 #include <limits>
 
 namespace kapil {
-  class string final {
+  class string {
     private:
       static constexpr std::size_t default_capacity_ = 0;
       std::size_t current_capacity_;
